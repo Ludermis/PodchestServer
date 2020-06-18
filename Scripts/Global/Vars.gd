@@ -1,11 +1,9 @@
 extends Node
 
 var playerCount = 0
-var playerIDS = []
 var players = {}
-var dirts = {}
-var dirtCount = 0
-var teams = {}
+var rooms = {}
+var roomUniqueID = 1
 
 func _ready():
 	pass

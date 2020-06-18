@@ -21,13 +21,13 @@ func _process(delta):
 		server.poll();
 
 func playerConnected (id):
+	Vars.playerCount += 1
+	Vars.players[id] = {"room": -1}
 	print(str("player ", id, " connected."))
 
 func playerDisconnected (id):
 	print(str("player ", id, " disconnected."))
-	if Vars.playerIDS.has(id):
-		Vars.playerCount -= 1
-		get_tree().root.get_node("Main").rpc("playerDisconnected",id)
-		Vars.playerIDS.erase(id)
-	if Vars.players.has(id):
-		Vars.players.erase(id)
+	if Vars.players[id]["room"] != -1 && Vars.rooms.has(Vars.players[id]["room"]):
+		Vars.rooms[Vars.players[id]["room"]].playerDisconnected(id)
+	Vars.playerCount -= 1
+	Vars.players.erase(id)

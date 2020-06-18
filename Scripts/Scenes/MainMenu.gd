@@ -2,41 +2,27 @@ extends Node2D
 
 
 func _ready():
-	randomize()
-	var firstH = randf()
-	var secondH = randf()
-	while abs(firstH - secondH) < 0.4:
-		secondH = randf()
-	Vars.teams[1] = {"color": Color.from_hsv(firstH, 1.0, 1.0, 1.0)}
-	Vars.teams[2] = {"color": Color.from_hsv(secondH, 1.0, 1.0, 1.0)}
 	Server.startServer()
 
-remote func playerJoined (who):
-	randomize()
-	Vars.playerCount += 1
-	Vars.playerIDS.append(who)
-	Vars.players[who] = {"position": Vector2.ZERO, "color" : Vars.teams[((Vars.playerCount + 1) % 2) + 1]["color"], "team": ((Vars.playerCount + 1) % 2) + 1}
-	print(str("user ", who," defined."))
-	rpc_id(who,"updateTeams",Vars.teams)
-	for i in Vars.playerIDS:
-		rpc_id(who,"playerJoined",i,Vars.players[i])
-	for i in Vars.playerIDS:
-		if i != who:
-			rpc_id(i,"playerJoined",who,Vars.players[who])
-	for i in Vars.dirts:
-		rpc_id(who,"dirtCreated",Vars.dirts[i])
+remote func playerJoined (who, msg):
+	if msg == "quickgame":
+		if Vars.rooms.size() == 0:
+			var room = preload("res://Scripts/Network/Room.gd").new()
+			room.main = get_tree().root.get_node("Main")
+			room.id = Vars.roomUniqueID
+			room.ready()
+			Vars.rooms[room.id] = room
+			Vars.players[who]["room"] = room.id
+			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
+		else:
+			Vars.players[who]["room"] = Vars.rooms.keys()[0]
+			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
 
-remote func dirtCreated (pos, color):
-	Vars.dirtCount += 1
-	Vars.dirts[pos] = {"position": pos, "color": color}
-	rpc("dirtCreated",Vars.dirts[pos])
+remote func dirtCreated (who, pos, color):
+	Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,pos,color)
 
-remote func dirtChanged (pos, color):
-	Vars.dirts[pos]["color"] = color
-	rpc("dirtChanged",Vars.dirts[pos])
+remote func dirtChanged (who, pos, color):
+	Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,color)
 
 remote func updatePosition (who, newPosition):
-	Vars.players[who]["position"] = newPosition
-	for i in Vars.playerIDS:
-		if i != who:
-			rpc_unreliable_id(i,"positionUpdated",who,newPosition)
+	Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)
