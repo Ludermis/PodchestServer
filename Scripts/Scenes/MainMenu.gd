@@ -23,17 +23,17 @@ remote func playerJoined (who):
 	for i in Vars.playerIDS:
 		if i != who:
 			rpc_id(i,"playerJoined",who,Vars.players[who])
-	for i in range(1,Vars.dirtCount + 1):
+	for i in Vars.dirts:
 		rpc_id(who,"dirtCreated",Vars.dirts[i])
 
 remote func dirtCreated (pos, color):
 	Vars.dirtCount += 1
-	Vars.dirts[Vars.dirtCount] = {"id": Vars.dirtCount, "position": pos, "color": color}
-	rpc("dirtCreated",Vars.dirts[Vars.dirtCount])
+	Vars.dirts[pos] = {"position": pos, "color": color}
+	rpc("dirtCreated",Vars.dirts[pos])
 
-remote func dirtChanged (id, color):
-	Vars.dirts[id]["color"] = color
-	rpc("dirtChanged",Vars.dirts[id])
+remote func dirtChanged (pos, color):
+	Vars.dirts[pos]["color"] = color
+	rpc("dirtChanged",Vars.dirts[pos])
 
 remote func updatePosition (who, newPosition):
 	Vars.players[who]["position"] = newPosition
