@@ -14,6 +14,7 @@ func startServer():
 	get_tree().connect("network_peer_connected", self, "playerConnected")
 	get_tree().connect("network_peer_disconnected", self, "playerDisconnected")
 	print("Server started.")
+	
 
 func _process(delta):
 	if server.is_listening():
@@ -25,6 +26,8 @@ func playerConnected (id):
 func playerDisconnected (id):
 	print(str("player ", id, " disconnected."))
 	if Vars.playerIDS.has(id):
+		Vars.playerCount -= 1
+		get_tree().root.get_node("Main").rpc("playerDisconnected",id)
 		Vars.playerIDS.erase(id)
 	if Vars.players.has(id):
 		Vars.players.erase(id)

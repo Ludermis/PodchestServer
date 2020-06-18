@@ -17,6 +17,7 @@ _global_script_class_icons={
 
 config/name="Podchest Server"
 run/main_scene="res://Prefabs/Scenes/MainMenu.tscn"
+boot_splash/image="res://Sprites/Misc/black.png"
 config/icon="res://icon.png"
 
 [autoload]
