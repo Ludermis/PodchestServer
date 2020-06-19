@@ -23,11 +23,11 @@ func _process(delta):
 func playerConnected (id):
 	Vars.playerCount += 1
 	Vars.players[id] = {"room": -1}
-	print(str("player ", id, " connected."))
+	print(str("user ", id, " connected."))
 
 func playerDisconnected (id):
-	print(str("player ", id, " disconnected."))
 	if Vars.players[id]["room"] != -1 && Vars.rooms.has(Vars.players[id]["room"]):
 		Vars.rooms[Vars.players[id]["room"]].playerDisconnected(id)
 	Vars.playerCount -= 1
 	Vars.players.erase(id)
+	print(str("user ", id, " disconnected."))

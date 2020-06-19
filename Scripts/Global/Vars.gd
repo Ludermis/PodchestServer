@@ -4,9 +4,13 @@ var playerCount = 0
 var players = {}
 var rooms = {}
 var roomUniqueID = 1
+var time : float = 0 setget ,getTime
 
 func _ready():
 	pass
 
 func _process(delta):
 	pass
+
+func getTime() -> float:
+	return OS.get_ticks_msec() / 1000.0
