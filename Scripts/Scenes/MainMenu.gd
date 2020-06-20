@@ -3,6 +3,7 @@ extends Node2D
 
 func _ready():
 	randomize()
+	Vars.loadAccounts()
 	Server.startServer()
 
 func _process(delta):
@@ -13,7 +14,7 @@ remote func playerJoined (who, msg):
 	if msg == "quick1v1":
 		var foundRoom = -1
 		for i in Vars.rooms:
-			if Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
+			if Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
 				foundRoom = Vars.rooms[i].id
 		if foundRoom == -1:
 			var room = preload("res://Scripts/Network/Room.gd").new()
@@ -31,7 +32,7 @@ remote func playerJoined (who, msg):
 	if msg == "quick2v2":
 		var foundRoom = -1
 		for i in Vars.rooms:
-			if Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
+			if Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
 				foundRoom = Vars.rooms[i].id
 		if foundRoom == -1:
 			var room = preload("res://Scripts/Network/Room.gd").new()
@@ -69,3 +70,12 @@ remote func dirtChanged (who, pos, color):
 
 remote func updatePosition (who, newPosition):
 	Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)
+
+remote func registerAccount (who, username, password):
+	print("user " + str(who) + " tried to register a account with " + username + ":" + password)
+	if Vars.accounts.has(username):
+		print("user " + str(who) + " couldn't register the account because username " + username + " already exists.")
+	else:
+		Vars.accounts[username] = {"password": password}
+		Vars.saveAccounts()
+		print("user " + str(who) + " registered account " + username)
