@@ -20,7 +20,6 @@ func ready():
 	teams[1] = {"color": Color.from_hsv(randf(),1.0,1.0), "playerCount": 0, "score": 0}
 	teams[2] = {"color": teams[1]["color"].inverted(), "playerCount": 0, "score": 0}
 	print("Room " + str(id) + " created.")
-	print(str(teams[1]["color"]))
 
 func update():
 	if started == true && ended == false && (started && Vars.time - gameStartedTime >= gameLength):
@@ -66,6 +65,11 @@ func dirtChanged (who, pos, color):
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
 			main.rpc_id(i,"dirtChanged",dirts[pos])
+
+func updateAnimation (who, anim):
+	for i in playerIDS:
+		if Vars.players[i]["inGame"] && i != who:
+			main.rpc_id(i,"animationUpdated",who,anim)
 
 func updatePosition (who, newPosition):
 	Vars.players[who]["position"] = newPosition

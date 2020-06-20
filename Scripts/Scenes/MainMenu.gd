@@ -54,22 +54,32 @@ remote func demandOnline(who):
 	rpc_id(who,"updateStats",{"rooms": Vars.rooms.size(), "playerCount": Vars.playerCount})
 
 remote func leaveRoom (who):
-	Vars.rooms[Vars.players[who]["room"]].leaveRoom(who)
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].leaveRoom(who)
 
 remote func demandGameTime (who):
-	Vars.rooms[Vars.players[who]["room"]].demandGameTime(who)
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who)
 
 remote func readyToGetObjects(who):
-	Vars.rooms[Vars.players[who]["room"]].readyToGetObjects(who)
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].readyToGetObjects(who)
 
 remote func dirtCreated (who, pos, color):
-	Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,pos,color)
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,pos,color)
 
 remote func dirtChanged (who, pos, color):
-	Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,color)
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,color)
 
 remote func updatePosition (who, newPosition):
-	Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)
+
+remote func updateAnimation (who, anim):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].updateAnimation(who,anim)
 
 remote func registerAccount (who, username, password):
 	print("user " + str(who) + " tried to register a account with " + username + ":" + password)
