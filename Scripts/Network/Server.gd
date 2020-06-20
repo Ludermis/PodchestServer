@@ -30,4 +30,6 @@ func playerDisconnected (id):
 		Vars.rooms[Vars.players[id]["room"]].playerDisconnected(id)
 	Vars.playerCount -= 1
 	Vars.players.erase(id)
+	if Vars.accountsByIDs.has(id):
+		Vars.accountsByIDs.erase(id)
 	print(str("user ", id, " disconnected."))

@@ -6,6 +6,7 @@ var rooms = {}
 var roomUniqueID = 1
 var time : float = 0 setget ,getTime
 var accounts = {}
+var accountsByIDs = {}
 
 func _ready():
 	pass

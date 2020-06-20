@@ -74,8 +74,30 @@ remote func updatePosition (who, newPosition):
 remote func registerAccount (who, username, password):
 	print("user " + str(who) + " tried to register a account with " + username + ":" + password)
 	if Vars.accounts.has(username):
+		rpc_id(who,"registerFailed","That username already exists.")
 		print("user " + str(who) + " couldn't register the account because username " + username + " already exists.")
 	else:
 		Vars.accounts[username] = {"password": password}
 		Vars.saveAccounts()
+		rpc_id(who,"registerCompleted")
 		print("user " + str(who) + " registered account " + username)
+
+remote func logoutAccount (who):
+	if !Vars.accountsByIDs.has(who):
+		print("user " + str(who) + " tried to logout, but is not logged in. WTF ?")
+	else:
+		print("user " + str(who) + " logged out from " + Vars.accountsByIDs[who])
+		Vars.accountsByIDs.erase(who)
+
+remote func loginAccount (who, username, password):
+	print("user " + str(who) + " tried to login a account with " + username + ":" + password)
+	if !Vars.accounts.has(username):
+		rpc_id(who,"loginFailed")
+		print("user " + str(who) + " couldn't login to account " + username + " because it doesn't exist.")
+	elif Vars.accounts[username]["password"] != password:
+		rpc_id(who,"loginFailed")
+		print("user " + str(who) + " couldn't login to account " + username + " because the password wasn't correct.")
+	else:
+		rpc_id(who,"loginCompleted",Vars.accounts[username])
+		Vars.accountsByIDs[who] = username
+		print("user " + str(who) + " logged in account " + username)
