@@ -20,7 +20,7 @@ func getTime() -> float:
 func saveAccounts ():
 	var save = File.new()
 	save.open("user://accounts.txt",File.WRITE)
-	save.store_line(JSON.print(accounts, " "))
+	save.store_string(JSON.print(accounts, " "))
 
 func loadAccounts():
 	var save = File.new()
