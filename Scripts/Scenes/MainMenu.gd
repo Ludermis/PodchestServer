@@ -73,6 +73,10 @@ remote func dirtChanged (who, pos, color):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,color)
 
+remote func skillCast (who, data):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].skillCast(who,data)
+
 remote func updatePosition (who, newPosition):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)

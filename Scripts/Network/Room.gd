@@ -86,6 +86,11 @@ func readyToGetObjects (who):
 	for i in dirts:
 		main.rpc_id(who,"dirtCreated",dirts[i])
 
+func skillCast (who, data):
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"skillCast",who,data)
+
 func demandGameTime(who):
 	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime))
 
