@@ -83,11 +83,23 @@ remote func dirtChanged (who, pos, team):
 	else:
 		Vars.logError("User" + str(who) + " tried to dirtChanged but that room doesn't exists.")
 
-remote func skillCast (who, data):
+remote func objectCreated (who, obj, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].skillCast(who,data)
+		Vars.rooms[Vars.players[who]["room"]].objectCreated(who, obj, data)
 	else:
-		Vars.logError("User" + str(who) + " tried to skillCast but that room doesn't exists.")
+		Vars.logError("User" + str(who) + " tried to objectCreated but that room doesn't exists.")
+
+remote func objectUpdated (who, obj, data):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].objectUpdated(who, obj, data)
+	else:
+		Vars.logError("User" + str(who) + " tried to objectUpdated but that room doesn't exists.")
+
+remote func objectRemoved (who, obj):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].objectRemoved(who, obj)
+	else:
+		Vars.logError("User" + str(who) + " tried to objectRemoved but that room doesn't exists.")
 
 remote func updatePosition (who, newPosition):
 	if Vars.rooms.has(Vars.players[who]["room"]):
