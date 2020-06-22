@@ -56,62 +56,78 @@ remote func demandOnline(who):
 remote func leaveRoom (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].leaveRoom(who)
+	else:
+		Vars.logError("User" + str(who) + " tried to leaveRoom but that room doesn't exists.")
 
 remote func demandGameTime (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who)
+	else:
+		Vars.logError("User" + str(who) + " tried to demandGameTime but that room doesn't exists.")
 
 remote func readyToGetObjects(who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].readyToGetObjects(who)
+	else:
+		Vars.logError("User" + str(who) + " tried to readyToGetObjects but that room doesn't exists.")
 
-remote func dirtCreated (who, pos, color):
+remote func dirtCreated (who, pos, team):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,pos,color)
+		Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,pos,team)
+	else:
+		Vars.logError("User" + str(who) + " tried to dirtCreated but that room doesn't exists.")
 
-remote func dirtChanged (who, pos, color):
+remote func dirtChanged (who, pos, team):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,color)
+		Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,team)
+	else:
+		Vars.logError("User" + str(who) + " tried to dirtChanged but that room doesn't exists.")
 
 remote func skillCast (who, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].skillCast(who,data)
+	else:
+		Vars.logError("User" + str(who) + " tried to skillCast but that room doesn't exists.")
 
 remote func updatePosition (who, newPosition):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)
+	else:
+		Vars.logError("User" + str(who) + " tried to updatePosition but that room doesn't exists.")
 
 remote func updateAnimation (who, anim):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].updateAnimation(who,anim)
+	else:
+		Vars.logError("User" + str(who) + " tried to updateAnimation but that room doesn't exists.")
 
 remote func registerAccount (who, username, password):
-	print("user " + str(who) + " tried to register a account with " + username + ":" + password)
+	Vars.logInfo("User " + str(who) + " tried to register a account with " + username + ":" + password)
 	if Vars.accounts.has(username):
 		rpc_id(who,"registerFailed","That username already exists.")
-		print("user " + str(who) + " couldn't register the account because username " + username + " already exists.")
+		Vars.logInfo("User " + str(who) + " couldn't register the account because username " + username + " already exists.")
 	else:
 		Vars.accounts[username] = {"password": password}
 		Vars.saveAccounts()
 		rpc_id(who,"registerCompleted")
-		print("user " + str(who) + " registered account " + username)
+		Vars.logInfo("User " + str(who) + " registered account " + username)
 
 remote func logoutAccount (who):
 	if !Vars.accountsByIDs.has(who):
-		print("user " + str(who) + " tried to logout, but is not logged in. WTF ?")
+		Vars.logError("User " + str(who) + " tried to logout, but is not logged in. WTF ?")
 	else:
-		print("user " + str(who) + " logged out from " + Vars.accountsByIDs[who])
+		Vars.logInfo("User " + str(who) + " logged out from " + Vars.accountsByIDs[who] + " via manual logout")
 		Vars.accountsByIDs.erase(who)
 
 remote func loginAccount (who, username, password):
-	print("user " + str(who) + " tried to login a account with " + username + ":" + password)
+	Vars.logInfo("User " + str(who) + " tried to login a account with " + username + ":" + password)
 	if !Vars.accounts.has(username):
 		rpc_id(who,"loginFailed")
-		print("user " + str(who) + " couldn't login to account " + username + " because it doesn't exist.")
+		Vars.logInfo("User " + str(who) + " couldn't login to account " + username + " because it doesn't exist.")
 	elif Vars.accounts[username]["password"] != password:
 		rpc_id(who,"loginFailed")
-		print("user " + str(who) + " couldn't login to account " + username + " because the password wasn't correct.")
+		Vars.logInfo("User " + str(who) + " couldn't login to account " + username + " because the password wasn't correct.")
 	else:
 		rpc_id(who,"loginCompleted",Vars.accounts[username])
 		Vars.accountsByIDs[who] = username
-		print("user " + str(who) + " logged in account " + username)
+		Vars.logInfo("User " + str(who) + " logged in account " + username)

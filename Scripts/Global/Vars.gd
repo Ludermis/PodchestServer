@@ -14,6 +14,25 @@ func _ready():
 func _process(delta):
 	pass
 
+func currentTimeToString ():
+	var timeDict = OS.get_time();
+	var hS = str(timeDict.hour)
+	var mS = str(timeDict.minute)
+	var sS = str(timeDict.second)
+	if timeDict.hour < 10:
+		hS = "0" + hS
+	if timeDict.minute < 10:
+		mS = "0" + mS
+	if timeDict.second < 10:
+		sS = "0" + sS
+	return str("[",hS,":",mS,":",sS,"]")
+
+func logInfo (msg):
+	print ("[INFO] " + currentTimeToString() + " " + msg)
+
+func logError (msg):
+	print ("[ERROR] " + currentTimeToString() + " " + msg)
+
 func getTime() -> float:
 	return OS.get_ticks_msec() / 1000.0
 
