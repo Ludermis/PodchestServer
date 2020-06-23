@@ -71,9 +71,9 @@ remote func leaveRoom (who):
 	else:
 		Vars.logError("User" + str(who) + " tried to leaveRoom but that room doesn't exists.")
 
-remote func demandGameTime (who):
+remote func demandGameTime (who, unixTime):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who)
+		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime)
 	else:
 		Vars.logError("User" + str(who) + " tried to demandGameTime but that room doesn't exists.")
 
@@ -112,18 +112,6 @@ remote func objectRemoved (who, obj):
 		Vars.rooms[Vars.players[who]["room"]].objectRemoved(who, obj)
 	else:
 		Vars.logError("User" + str(who) + " tried to objectRemoved but that room doesn't exists.")
-
-remote func updatePosition (who, newPosition):
-	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].updatePosition(who,newPosition)
-	else:
-		Vars.logError("User" + str(who) + " tried to updatePosition but that room doesn't exists.")
-
-remote func updateAnimation (who, anim):
-	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].updateAnimation(who,anim)
-	else:
-		Vars.logError("User" + str(who) + " tried to updateAnimation but that room doesn't exists.")
 
 remote func registerAccount (who, username, password):
 	Vars.logInfo("User " + str(who) + " tried to register a account with " + username + ":" + password)

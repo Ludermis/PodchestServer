@@ -27,12 +27,20 @@ func ready():
 	Vars.logInfo("Room " + str(id) + " created.")
 
 func findNewRoomMaster ():
+	var rtn = -1
 	for i in playerIDS:
 		if playersFocused[i]:
-			return i
-	return -1
+			if rtn == -1:
+				rtn = i
+			elif Vars.players[i]["ping"] < Vars.players[rtn]["ping"]:
+				rtn = i
+	return rtn
 
 func update():
+	var rm = findNewRoomMaster()
+	if rm != roomMaster:
+		roomMaster = rm
+		broadcastRoomMaster()
 	if started == true && ended == false && (started && Vars.time - gameStartedTime >= gameLength):
 		endGame()
 
@@ -85,16 +93,14 @@ func playerJoined (who):
 	if teams[2]["playerCount"] < teams[1]["playerCount"]:
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
-	Vars.players[who] = {"room": id, "position": Vector2.ZERO, "color" : teams[playerTeam]["color"], "team": playerTeam, "inGame": false}
+	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
+	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2.ZERO, "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam}}
 	if started:
 		main.rpc_id(who,"gameStarted")
-		for i in playerIDS:
-			if Vars.players[i]["inGame"]:
-				main.rpc_id(i,"playerJoined",who,Vars.players[who])
 	else:
 		for i in playerIDS:
 				main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
-	Vars.logInfo(str("User ", who," joined room ", id, " || ", playerCount, " / ", minPlayers))
+	Vars.logInfo(str("User ", who," joined room ", id, " [", playerCount, " / ", minPlayers, "]"))
 	if playerCount == minPlayers && started == false:
 		startGame()
 
@@ -128,17 +134,6 @@ func dirtChanged (who, pos, team):
 		if Vars.players[i]["inGame"]:
 			main.rpc_id(i,"dirtChanged",dirts[pos])
 
-func updateAnimation (who, anim):
-	for i in playerIDS:
-		if Vars.players[i]["inGame"] && i != who:
-			main.rpc_id(i,"animationUpdated",who,anim)
-
-func updatePosition (who, newPosition):
-	Vars.players[who]["position"] = newPosition
-	for i in playerIDS:
-		if Vars.players[i]["inGame"] && i != who:
-			main.rpc_id(i,"positionUpdated",who,newPosition)
-
 func readyToGetObjects (who):
 	if ended:
 		main.rpc_id(who,"updateTeams",teams)
@@ -149,14 +144,20 @@ func readyToGetObjects (who):
 	for i in playerIDS:
 		main.rpc_id(i,"updateTeams",teams)
 	for i in playerIDS:
-		main.rpc_id(who,"playerJoined",i,Vars.players[i])
+		if Vars.players[i]["inGame"] && i != who:
+			main.rpc_id(i,"playerJoined",who,objects[who]["object"],objects[who]["data"])
 	for i in dirts:
 		main.rpc_id(who,"dirtCreated",dirts[i])
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(who,"playerJoined",i,objects[i]["object"],objects[i]["data"])
 	for i in objects:
-		main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[i]["data"])
+		if !("Characters" in objects[i]["object"]):
+			main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[i]["data"])
 
-func demandGameTime(who):
-	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime))
+func demandGameTime(who, unixTime):
+	Vars.players[who]["ping"] = OS.get_system_time_msecs() - unixTime
+	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
 
 func playerDisconnected (who):
 	leaveRoom(who)
@@ -165,10 +166,12 @@ func leaveRoom (who):
 	playerCount -= 1
 	playerIDS.erase(who)
 	playersFocused.erase(who)
+	teams[objects[who]["data"]["team"]]["playerCount"] -= 1
+	objects.erase(who)
 	if roomMaster == who:
 		roomMaster = findNewRoomMaster()
 		broadcastRoomMaster()
-	teams[Vars.players[who]["team"]]["playerCount"] -= 1
+	
 	if started && ended == false:
 		for i in playerIDS:
 			if Vars.players[i]["inGame"]:
@@ -179,7 +182,7 @@ func leaveRoom (who):
 	if !started:
 		for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
-	Vars.logInfo(str("User ", who," left room ", id, " || ", playerCount, " / ", minPlayers))
+	Vars.logInfo(str("User ", who," left room ", id, " [", playerCount, " / ", minPlayers, "]"))
 	if playerCount == 0:
 		if ended == false:
 			removeRoom(str("Room ", id," is removed because no players left."))

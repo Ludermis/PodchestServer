@@ -22,7 +22,7 @@ func _process(delta):
 
 func playerConnected (id):
 	Vars.playerCount += 1
-	Vars.players[id] = {"room": -1}
+	Vars.players[id] = {"room": -1, "ping": 0}
 	Vars.logInfo(str("User ", id, " connected with IP : " , server.get_peer_address(id)))
 
 func playerDisconnected (id):
