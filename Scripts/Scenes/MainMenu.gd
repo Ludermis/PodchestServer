@@ -53,6 +53,18 @@ remote func playerJoined (who, msg):
 remote func demandOnline(who):
 	rpc_id(who,"updateStats",{"rooms": Vars.rooms.size(), "playerCount": Vars.playerCount})
 
+remote func playerFocused (who):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].playerFocused(who)
+	else:
+		Vars.logError("User" + str(who) + " tried to playerFocused but that room doesn't exists.")
+
+remote func playerUnfocused (who):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].playerUnfocused(who)
+	else:
+		Vars.logError("User" + str(who) + " tried to playerUnfocused but that room doesn't exists.")
+
 remote func leaveRoom (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].leaveRoom(who)

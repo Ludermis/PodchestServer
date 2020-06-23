@@ -15,11 +15,10 @@ var gameStartedTime : float
 var gameLength : float
 var type = "none"
 var winner
-var uniqueObjectID = 1
+var uniqueObjectID = 0
 var objects = {}
 var roomMaster = -1
-var playerLastSeen = {}
-var roomMasterChangeTime = 0.2
+var playersFocused = {}
 
 func ready():
 	Vars.roomUniqueID += 1
@@ -28,30 +27,27 @@ func ready():
 	Vars.logInfo("Room " + str(id) + " created.")
 
 func findNewRoomMaster ():
-	var t = Vars.time
 	for i in playerIDS:
-		if t - playerLastSeen[i] <= roomMasterChangeTime:
+		if playersFocused[i]:
 			return i
 	return -1
 
 func update():
-	if started && ended == false:
-		if roomMaster != -1 && Vars.time - playerLastSeen[roomMaster] > roomMasterChangeTime:
-			roomMaster = findNewRoomMaster()
-			broadcastRoomMaster()
-		elif roomMaster == -1:
-			roomMaster = findNewRoomMaster()
-			broadcastRoomMaster()
 	if started == true && ended == false && (started && Vars.time - gameStartedTime >= gameLength):
 		endGame()
 
+func newUniqueObjectID():
+	uniqueObjectID += 1
+	while playerIDS.has(uniqueObjectID):
+		uniqueObjectID += 1
+
 func objectCreated (who, obj, data):
+	newUniqueObjectID()
 	data["id"] = uniqueObjectID
 	objects[uniqueObjectID] = {"object": obj, "data": data}
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
 			main.rpc_id(i,"objectCreated",who, obj, data)
-	uniqueObjectID += 1
 
 func objectUpdated (who, obj, data):
 	for i in data.keys():
@@ -69,13 +65,22 @@ func broadcastRoomMaster ():
 	for i in playerIDS:
 		main.rpc_id(i,"roomMasterChanged",roomMaster)
 
+func playerUnfocused (who):
+	playersFocused[who] = false
+	if who == roomMaster:
+		roomMaster = findNewRoomMaster()
+		broadcastRoomMaster()
+
+func playerFocused (who):
+	playersFocused[who] = true
+	if roomMaster == -1:
+		roomMaster = who
+		broadcastRoomMaster()
+
 func playerJoined (who):
 	playerCount += 1
 	playerIDS.append(who)
-	playerLastSeen[who] = 0
-	if roomMaster == -1:
-		roomMaster = who
-	broadcastRoomMaster()
+	playersFocused[who] = false
 	var playerTeam = 1
 	if teams[2]["playerCount"] < teams[1]["playerCount"]:
 		playerTeam = 2
@@ -101,6 +106,9 @@ func startGame ():
 		main.rpc_id(i,"gameStarted")
 
 func dirtCreated (who, pos, team):
+	if dirts.has(pos):
+		Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
+		return
 	dirtCount += 1
 	dirts[pos] = {"position": pos, "color": teams[team]["color"], "team": team}
 	teams[dirts[pos]["team"]]["score"] += 1
@@ -109,6 +117,9 @@ func dirtCreated (who, pos, team):
 			main.rpc_id(i,"dirtCreated",dirts[pos])
 
 func dirtChanged (who, pos, team):
+	if !dirts.has(pos):
+		Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
+		return
 	teams[dirts[pos]["team"]]["score"] -= 1
 	dirts[pos]["color"] = teams[team]["color"]
 	dirts[pos]["team"] = team
@@ -123,7 +134,6 @@ func updateAnimation (who, anim):
 			main.rpc_id(i,"animationUpdated",who,anim)
 
 func updatePosition (who, newPosition):
-	playerLastSeen[who] = Vars.time
 	Vars.players[who]["position"] = newPosition
 	for i in playerIDS:
 		if Vars.players[i]["inGame"] && i != who:
@@ -135,6 +145,7 @@ func readyToGetObjects (who):
 		main.rpc_id(who,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]]})
 		return
 	Vars.players[who]["inGame"] = true
+	playerFocused(who)
 	for i in playerIDS:
 		main.rpc_id(i,"updateTeams",teams)
 	for i in playerIDS:
@@ -153,12 +164,9 @@ func playerDisconnected (who):
 func leaveRoom (who):
 	playerCount -= 1
 	playerIDS.erase(who)
-	playerLastSeen.erase(who)
+	playersFocused.erase(who)
 	if roomMaster == who:
-		if playerIDS.size() > 0:
-			roomMaster = playerIDS[0]
-		else:
-			roomMaster = -1
+		roomMaster = findNewRoomMaster()
 		broadcastRoomMaster()
 	teams[Vars.players[who]["team"]]["playerCount"] -= 1
 	if started && ended == false:
