@@ -37,10 +37,6 @@ func findNewRoomMaster ():
 	return rtn
 
 func update():
-	var rm = findNewRoomMaster()
-	if rm != roomMaster:
-		roomMaster = rm
-		broadcastRoomMaster()
 	if started == true && ended == false && (started && Vars.time - gameStartedTime >= gameLength):
 		endGame()
 
@@ -157,7 +153,10 @@ func readyToGetObjects (who):
 
 func demandGameTime(who, unixTime):
 	Vars.players[who]["ping"] = OS.get_system_time_msecs() - unixTime
-	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
+	if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"]:
+		roomMaster = who
+		broadcastRoomMaster()
+	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), Vars.players[who]["ping"])
 
 func playerDisconnected (who):
 	leaveRoom(who)
