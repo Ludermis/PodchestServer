@@ -71,9 +71,9 @@ remote func leaveRoom (who):
 	else:
 		Vars.logError("User" + str(who) + " tried to leaveRoom but that room doesn't exists.")
 
-remote func demandGameTime (who, unixTime):
+remote func demandGameTime (who, unixTime, ping):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime)
+		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime, ping)
 	else:
 		Vars.logError("User" + str(who) + " tried to demandGameTime but that room doesn't exists.")
 

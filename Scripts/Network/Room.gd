@@ -151,12 +151,12 @@ func readyToGetObjects (who):
 		if !("Characters" in objects[i]["object"]):
 			main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[i]["data"])
 
-func demandGameTime(who, unixTime):
-	Vars.players[who]["ping"] = OS.get_system_time_msecs() - unixTime
-	if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"]:
+func demandGameTime(who, unixTime, ping):
+	Vars.players[who]["ping"] = ping
+	if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 10:
 		roomMaster = who
 		broadcastRoomMaster()
-	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), Vars.players[who]["ping"])
+	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
 
 func playerDisconnected (who):
 	leaveRoom(who)
