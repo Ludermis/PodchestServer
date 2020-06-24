@@ -96,7 +96,7 @@ func playerJoined (who):
 	else:
 		for i in playerIDS:
 				main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
-	Vars.logInfo(str("User ", who," joined room ", id, " [", playerCount, " / ", minPlayers, "]"))
+	Vars.logInfo(str("User ", who, " (", Vars.getNameByID(who), ") joined room ", id, " [", playerCount, " / ", minPlayers, "]"))
 	if playerCount == minPlayers && started == false:
 		startGame()
 
@@ -109,7 +109,7 @@ func startGame ():
 
 func dirtCreated (who, pos, team):
 	if dirts.has(pos):
-		Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
+		#Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
 		return
 	dirtCount += 1
 	dirts[pos] = {"position": pos, "color": teams[team]["color"], "team": team}
@@ -181,7 +181,7 @@ func leaveRoom (who):
 	if !started:
 		for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
-	Vars.logInfo(str("User ", who," left room ", id, " [", playerCount, " / ", minPlayers, "]"))
+	Vars.logInfo(str("User ", who, " (", Vars.getNameByID(who), ") left room ", id, " [", playerCount, " / ", minPlayers, "]"))
 	if playerCount == 0:
 		if ended == false:
 			removeRoom(str("Room ", id," is removed because no players left."))

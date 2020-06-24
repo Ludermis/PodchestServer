@@ -7,12 +7,19 @@ var roomUniqueID = 1
 var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
+var IDsByAccounts = {}
 
 func _ready():
 	pass
 
 func _process(delta):
 	pass
+
+
+func getNameByID (who):
+	if !accountsByIDs.has(who):
+		return "Guest"
+	return accountsByIDs[who]
 
 func currentTimeToString ():
 	var timeDict = OS.get_time();

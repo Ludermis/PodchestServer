@@ -23,14 +23,17 @@ func _process(delta):
 func playerConnected (id):
 	Vars.playerCount += 1
 	Vars.players[id] = {"room": -1, "ping": 0}
-	Vars.logInfo(str("User ", id, " connected with IP : " , server.get_peer_address(id)))
+	Vars.logInfo(str("User ", id, " (", Vars.getNameByID(id), ") connected with IP : " , server.get_peer_address(id)))
 
 func playerDisconnected (id):
 	if Vars.players[id]["room"] != -1 && Vars.rooms.has(Vars.players[id]["room"]):
 		Vars.rooms[Vars.players[id]["room"]].playerDisconnected(id)
 	Vars.playerCount -= 1
 	Vars.players.erase(id)
+	Vars.logInfo(str("User ", id, " (",Vars.getNameByID(id),") ", "disconnected."))
+	
 	if Vars.accountsByIDs.has(id):
-		Vars.logInfo("User " + str(id) + " logged out from " + Vars.accountsByIDs[id] + " via disconnection")
+		Vars.logInfo("User " + str(id) + " (" + Vars.getNameByID(id) + ") logged out from " + Vars.accountsByIDs[id] + " via disconnection")
+		Vars.IDsByAccounts.erase(Vars.accountsByIDs[id])
 		Vars.accountsByIDs.erase(id)
-	Vars.logInfo(str("User ", id, " disconnected."))
+	
