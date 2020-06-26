@@ -58,61 +58,68 @@ remote func playerFocused (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].playerFocused(who)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to playerFocused but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to playerFocused but that room doesn't exists.")
 
 remote func playerUnfocused (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].playerUnfocused(who)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) +") tried to playerUnfocused but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) +") tried to playerUnfocused but that room doesn't exists.")
 
 remote func leaveRoom (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].leaveRoom(who)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to leaveRoom but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to leaveRoom but that room doesn't exists.")
+
+remote func confirmBuild (who, build):
+	if Vars.build == build:
+		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") confirmed their build.")
+	else:
+		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") could not confirm their build. [" + build + " / " + Vars.build + "]")
+		rpc_id(who,"wrongBuild",Vars.build)
 
 remote func demandGameTime (who, unixTime, ping):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime, ping)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to demandGameTime but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to demandGameTime but that room doesn't exists.")
 
 remote func readyToGetObjects(who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].readyToGetObjects(who)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to readyToGetObjects but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to readyToGetObjects but that room doesn't exists.")
 
 remote func dirtCreated (who, pos, team):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,pos,team)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtCreated but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtCreated but that room doesn't exists.")
 
 remote func dirtChanged (who, pos, team):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,pos,team)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtChanged but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtChanged but that room doesn't exists.")
 
 remote func objectCreated (who, obj, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectCreated(who, obj, data)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
 
 remote func objectUpdated (who, obj, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectUpdated(who, obj, data)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectUpdated but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectUpdated but that room doesn't exists.")
 
 remote func objectRemoved (who, obj):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectRemoved(who, obj)
 	else:
-		Vars.logError("User" + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectRemoved but that room doesn't exists.")
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectRemoved but that room doesn't exists.")
 
 remote func registerAccount (who, username, password):
 	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to register a account with " + username + ":" + password)

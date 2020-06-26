@@ -8,6 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
+var build = "3"
 
 func _ready():
 	pass

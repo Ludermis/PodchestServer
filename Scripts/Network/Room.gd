@@ -19,6 +19,8 @@ var uniqueObjectID = 0
 var objects = {}
 var roomMaster = -1
 var playersFocused = {}
+var mapSizeX = 50
+var mapSizeY = 50
 
 func ready():
 	Vars.roomUniqueID += 1
@@ -90,7 +92,7 @@ func playerJoined (who):
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
 	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
-	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2.ZERO, "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam}}
+	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam}}
 	if started:
 		main.rpc_id(who,"gameStarted")
 	else:
@@ -153,7 +155,7 @@ func readyToGetObjects (who):
 
 func demandGameTime(who, unixTime, ping):
 	Vars.players[who]["ping"] = ping
-	if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 10:
+	if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 20:
 		roomMaster = who
 		broadcastRoomMaster()
 	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
