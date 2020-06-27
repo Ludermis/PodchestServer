@@ -61,6 +61,20 @@ func optimizeVector(pos, opt):
 	newv.y = pos.y - ny;
 	return newv;
 
+func accountInfoCompleter(acc):
+	var needSave = false
+	if !accounts[acc].has("ownedCharacters"):
+		accounts[acc]["ownedCharacters"] = ["Villager"]
+		needSave = true
+	if !accounts[acc].has("gold"):
+		accounts[acc]["gold"] = 100
+		needSave = true
+	if !accounts[acc].has("AP"):
+		accounts[acc]["AP"] = 50
+		needSave = true
+	if needSave:
+		Vars.saveAccounts()
+
 func loadAccounts():
 	var save = File.new()
 	if not save.file_exists("user://accounts.txt"):

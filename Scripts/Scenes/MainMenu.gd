@@ -155,6 +155,7 @@ remote func loginAccount (who, username, password):
 		rpc_id(who,"loginFailed")
 		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") couldn't login to account " + username + " because he is already at some account.")
 	else:
+		Vars.accountInfoCompleter(username)
 		rpc_id(who,"loginCompleted",Vars.accounts[username])
 		Vars.accountsByIDs[who] = username
 		Vars.IDsByAccounts[username] = who
