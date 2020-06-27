@@ -92,7 +92,7 @@ func playerJoined (who):
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
 	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
-	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam}}
+	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
 	if started:
 		main.rpc_id(who,"gameStarted")
 	else:
