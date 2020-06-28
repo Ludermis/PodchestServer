@@ -15,7 +15,7 @@ remote func playerJoined (who, msg):
 	if msg == "quick1v1":
 		var foundRoom = -1
 		for i in Vars.rooms:
-			if Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
+			if Vars.rooms[i].started == false && Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
 				foundRoom = Vars.rooms[i].id
 		if foundRoom == -1:
 			var room = preload("res://Scripts/Network/Room.gd").new()
@@ -33,7 +33,7 @@ remote func playerJoined (who, msg):
 	if msg == "quick2v2":
 		var foundRoom = -1
 		for i in Vars.rooms:
-			if Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
+			if Vars.rooms[i].started == false && Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
 				foundRoom = Vars.rooms[i].id
 		if foundRoom == -1:
 			var room = preload("res://Scripts/Network/Room.gd").new()
@@ -108,6 +108,12 @@ remote func objectCreated (who, obj, data):
 		Vars.rooms[Vars.players[who]["room"]].objectCreated(who, obj, data)
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
+
+remote func selectCharacter (who, which):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].selectCharacter(who, which)
+	else:
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to selectCharacter but that room doesn't exists.")
 
 remote func objectUpdated (who, obj, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):

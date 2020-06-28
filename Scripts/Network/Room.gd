@@ -11,8 +11,11 @@ var minPlayers = 2
 var maxPlayers = 2
 var started = false
 var ended = false
+var selectionStarted = false
 var gameStartedTime : float
 var gameLength : float
+var selectionStartedTime : float
+var selectionLength : float = 10
 var type = "none"
 var winner
 var uniqueObjectID = 0
@@ -38,9 +41,14 @@ func findNewRoomMaster ():
 				rtn = i
 	return rtn
 
+func selectCharacter (who, which):
+	objects[who]["object"] = which
+
 func update():
-	if started == true && ended == false && (started && Vars.time - gameStartedTime >= gameLength):
+	if started == true && ended == false && Vars.time - gameStartedTime >= gameLength:
 		endGame()
+	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
+		startGame()
 
 func newUniqueObjectID():
 	uniqueObjectID += 1
@@ -93,14 +101,14 @@ func playerJoined (who):
 	teams[playerTeam]["playerCount"] += 1
 	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
 	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
-	if started:
-		main.rpc_id(who,"gameStarted")
-	else:
-		for i in playerIDS:
-				main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
+	for i in playerIDS:
+			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
 	Vars.logInfo(str("User ", who, " (", Vars.getNameByID(who), ") joined room ", id, " [", playerCount, " / ", minPlayers, "]"))
-	if playerCount == minPlayers && started == false:
-		startGame()
+	if playerCount == minPlayers && selectionStarted == false:
+		selectionStarted = true
+		selectionStartedTime = Vars.time
+		for i in playerIDS:
+			main.rpc_id(i,"selectionStarted")
 
 func startGame ():
 	started = true
@@ -110,6 +118,9 @@ func startGame ():
 		main.rpc_id(i,"gameStarted")
 
 func dirtCreated (who, pos, team):
+	if team <= 0:
+		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
+		return
 	if dirts.has(pos):
 		#Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
 		return
@@ -121,6 +132,9 @@ func dirtCreated (who, pos, team):
 			main.rpc_id(i,"dirtCreated",dirts[pos])
 
 func dirtChanged (who, pos, team):
+	if team <= 0:
+		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
+		return
 	if !dirts.has(pos):
 		Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
 		return
@@ -154,11 +168,14 @@ func readyToGetObjects (who):
 			main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[i]["data"])
 
 func demandGameTime(who, unixTime, ping):
-	Vars.players[who]["ping"] = ping
-	if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 20:
-		roomMaster = who
-		broadcastRoomMaster()
-	main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
+	if started:
+		Vars.players[who]["ping"] = ping
+		if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 20:
+			roomMaster = who
+			broadcastRoomMaster()
+		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
+	elif selectionStarted:
+		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), unixTime)
 
 func playerDisconnected (who):
 	leaveRoom(who)
