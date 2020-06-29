@@ -41,8 +41,9 @@ func findNewRoomMaster ():
 				rtn = i
 	return rtn
 
-func selectCharacter (who, which):
+func selectCharacter (who, which, skin):
 	objects[who]["object"] = which
+	objects[who]["data"]["skin"] = skin
 
 func update():
 	if started == true && ended == false && Vars.time - gameStartedTime >= gameLength:
@@ -100,7 +101,7 @@ func playerJoined (who):
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
 	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
-	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
+	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
 	for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
 	if started:

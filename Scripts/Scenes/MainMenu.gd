@@ -109,9 +109,9 @@ remote func objectCreated (who, obj, data):
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
 
-remote func selectCharacter (who, which):
+remote func selectCharacter (who, which, skin):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].selectCharacter(who, which)
+		Vars.rooms[Vars.players[who]["room"]].selectCharacter(who, which, skin)
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to selectCharacter but that room doesn't exists.")
 
