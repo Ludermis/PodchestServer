@@ -71,6 +71,9 @@ func accountInfoCompleter(acc):
 	if !accounts[acc].has("AP"):
 		accounts[acc]["AP"] = 50
 		needSave = true
+	if !accounts[acc].has("ownedSkins"):
+		accounts[acc]["ownedSkins"] = {}
+		needSave = true
 	if needSave:
 		Vars.saveAccounts()
 
