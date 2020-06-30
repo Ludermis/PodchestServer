@@ -51,6 +51,19 @@ remote func playerJoined (who, msg):
 			Vars.players[who]["room"] = foundRoom
 			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
 
+remote func buyFromStore (who, what):
+	if what["type"] == "skin":
+		if Vars.accounts[Vars.accountsByIDs[who]][Vars.store["skins"][what["character"]][what["item"]]["priceType"]] >= Vars.store["skins"][what["character"]][what["item"]]["price"]:
+			Vars.accounts[Vars.accountsByIDs[who]][Vars.store["skins"][what["character"]][what["item"]]["priceType"]] -= Vars.store["skins"][what["character"]][what["item"]]["price"]
+			if Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"].has(what["character"]):
+				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].append(what["item"])
+			else:
+				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]] = [what["item"]]
+	Vars.saveAccounts()
+
+remote func demandStore (who):
+	rpc_id(who,"updateStore",Vars.store)
+
 remote func demandOnline(who):
 	rpc_id(who,"updateStats",{"rooms": Vars.rooms.size(), "playerCount": Vars.playerCount})
 

@@ -10,6 +10,12 @@ var accountsByIDs = {}
 var IDsByAccounts = {}
 var build = "5"
 
+var store = {
+	"skins": {
+			"Villager": {"Villagernaut": {"price": 1350,"priceType": "AP"}}
+		}
+}
+
 func _ready():
 	pass
 
