@@ -15,7 +15,7 @@ var selectionStarted = false
 var gameStartedTime : float
 var gameLength : float
 var selectionStartedTime : float
-var selectionLength : float = 10
+var selectionLength : float = 3
 var type = "none"
 var winner
 var uniqueObjectID = 0
