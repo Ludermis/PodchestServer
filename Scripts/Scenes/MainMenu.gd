@@ -59,6 +59,8 @@ remote func buyFromStore (who, what):
 				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].append(what["item"])
 			else:
 				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]] = [what["item"]]
+			rpc_id(who,"accountInfoRefreshed",Vars.accounts[Vars.accountsByIDs[who]])
+			rpc_id(who,"buySuccessful")
 	Vars.saveAccounts()
 
 remote func demandStore (who):
