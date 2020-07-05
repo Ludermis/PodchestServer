@@ -53,12 +53,24 @@ remote func playerJoined (who, msg):
 
 remote func buyFromStore (who, what):
 	if what["type"] == "skin":
+		if Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"].has(what["character"]) && Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].has(what["item"]):
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that skin.")
+			return
 		if Vars.accounts[Vars.accountsByIDs[who]][Vars.store["skins"][what["character"]][what["item"]]["priceType"]] >= Vars.store["skins"][what["character"]][what["item"]]["price"]:
 			Vars.accounts[Vars.accountsByIDs[who]][Vars.store["skins"][what["character"]][what["item"]]["priceType"]] -= Vars.store["skins"][what["character"]][what["item"]]["price"]
 			if Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"].has(what["character"]):
 				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].append(what["item"])
 			else:
 				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]] = [what["item"]]
+			rpc_id(who,"accountInfoRefreshed",Vars.accounts[Vars.accountsByIDs[who]])
+			rpc_id(who,"buySuccessful")
+	elif what["type"] == "character":
+		if Vars.accounts[Vars.accountsByIDs[who]]["ownedCharacters"].has(what["item"]):
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that character.")
+			return
+		if Vars.accounts[Vars.accountsByIDs[who]]["gold"] >= Vars.store["characters"][what["character"]]["priceGold"]:
+			Vars.accounts[Vars.accountsByIDs[who]]["gold"] -= Vars.store["characters"][what["character"]]["priceGold"]
+			Vars.accounts[Vars.accountsByIDs[who]]["ownedCharacters"].append(what["item"])
 			rpc_id(who,"accountInfoRefreshed",Vars.accounts[Vars.accountsByIDs[who]])
 			rpc_id(who,"buySuccessful")
 	Vars.saveAccounts()

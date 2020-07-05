@@ -11,6 +11,9 @@ var IDsByAccounts = {}
 var build = "5"
 
 var store = {
+	"characters": {
+			"Xedarin": {"priceGold": 450,"priceAP": 100}
+		},
 	"skins": {
 			"Villager": {"Villagernaut": {"price": 1350,"priceType": "AP"}}
 		}
