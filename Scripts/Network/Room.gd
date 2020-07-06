@@ -65,6 +65,9 @@ func objectCreated (who, obj, data):
 			main.rpc_id(i,"objectCreated",who, obj, data)
 
 func objectUpdated (who, obj, data):
+	if !objects.has(obj):
+		Vars.logError("Room " + str(id) + " had a objectUpdated, but that object doesn't exist anymore.")
+		return
 	for i in data.keys():
 		objects[obj]["data"][i] = data[i]
 	for i in playerIDS:
