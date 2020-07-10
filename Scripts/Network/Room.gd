@@ -187,6 +187,9 @@ func playerDisconnected (who):
 	leaveRoom(who)
 
 func leaveRoom (who):
+	if !objects.has(who):
+		Vars.logError("Room " + str(id) + " had a leaveRoom, but that player doesn't exist in room.")
+		return
 	playerCount -= 1
 	playerIDS.erase(who)
 	playersFocused.erase(who)
