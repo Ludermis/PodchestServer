@@ -75,6 +75,9 @@ func objectUpdated (who, obj, data):
 			main.rpc_id(i,"objectUpdated",who, obj, objects[obj]["data"])
 
 func objectRemoved (who, obj):
+	if !objects.has(obj):
+		Vars.logError("Room " + str(id) + " had a objectRemoved, but that object doesn't exist anymore.")
+		return
 	objects.erase(obj)
 	for i in playerIDS:
 		if Vars.players[i]["inGame"] && i != who:
