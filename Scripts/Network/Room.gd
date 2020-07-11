@@ -75,6 +75,7 @@ func objectUpdated (who, obj, data):
 			main.rpc_id(i,"objectUpdated",who, obj, objects[obj]["data"])
 
 func objectRemoved (who, obj):
+	objects.erase(obj)
 	for i in playerIDS:
 		if Vars.players[i]["inGame"] && i != who:
 			main.rpc_id(i,"objectRemoved",who, obj)

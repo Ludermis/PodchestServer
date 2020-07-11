@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "6"
+var build = "7"
 
 var store = {
 	"characters": {
