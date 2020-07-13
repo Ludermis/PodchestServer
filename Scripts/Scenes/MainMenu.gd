@@ -75,6 +75,11 @@ remote func buyFromStore (who, what):
 			rpc_id(who,"buySuccessful")
 	Vars.saveAccounts()
 
+remote func demandAccountInfo (who):
+	if !Vars.accountsByIDs.has(who):
+		Vars.logError("User " + str(who) + "had a demandAccountInfo error")
+	rpc_id(who,"accountInfoRefreshed",Vars.accounts[Vars.accountsByIDs[who]])
+
 remote func demandStore (who):
 	rpc_id(who,"updateStore",Vars.store)
 

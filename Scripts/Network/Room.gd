@@ -182,7 +182,7 @@ func readyToGetObjects (who):
 func demandGameTime(who, unixTime, ping):
 	if started:
 		Vars.players[who]["ping"] = ping
-		if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 20:
+		if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 10:
 			roomMaster = who
 			broadcastRoomMaster()
 		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
