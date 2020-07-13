@@ -22,7 +22,7 @@ remote func playerJoined (who, msg):
 			room.main = get_tree().root.get_node("Main")
 			room.id = Vars.roomUniqueID
 			room.type = "quick1v1"
-			room.gameLength = 10
+			room.gameLength = 90
 			room.ready()
 			Vars.rooms[room.id] = room
 			Vars.players[who]["room"] = room.id
