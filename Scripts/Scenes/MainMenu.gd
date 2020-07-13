@@ -22,7 +22,7 @@ remote func playerJoined (who, msg):
 			room.main = get_tree().root.get_node("Main")
 			room.id = Vars.roomUniqueID
 			room.type = "quick1v1"
-			room.gameLength = 90
+			room.gameLength = 10
 			room.ready()
 			Vars.rooms[room.id] = room
 			Vars.players[who]["room"] = room.id
@@ -136,9 +136,9 @@ remote func objectCreated (who, obj, data):
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
 
-remote func selectCharacter (who, which, skin):
+remote func selectCharacter (who, which, characterName, skin):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].selectCharacter(who, which, skin)
+		Vars.rooms[Vars.players[who]["room"]].selectCharacter(who, which, characterName, skin)
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to selectCharacter but that room doesn't exists.")
 

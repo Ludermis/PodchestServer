@@ -27,8 +27,8 @@ var mapSizeY = 50
 
 func ready():
 	Vars.roomUniqueID += 1
-	teams[1] = {"color": Color.from_hsv(randf(),1.0,1.0), "playerCount": 0, "score": 0}
-	teams[2] = {"color": teams[1]["color"].inverted(), "playerCount": 0, "score": 0}
+	teams[1] = {"color": Color.from_hsv(randf(),1.0,1.0), "playerCount": 0, "score": 0, "playerNames": []}
+	teams[2] = {"color": teams[1]["color"].inverted(), "playerCount": 0, "score": 0, "playerNames": []}
 	Vars.logInfo("Room " + str(id) + " created.")
 
 func findNewRoomMaster ():
@@ -41,8 +41,9 @@ func findNewRoomMaster ():
 				rtn = i
 	return rtn
 
-func selectCharacter (who, which, skin):
+func selectCharacter (who, which, characterName, skin):
 	objects[who]["object"] = which
+	objects[who]["characterName"] = characterName
 	objects[who]["data"]["skin"] = skin
 
 func update():
@@ -107,8 +108,9 @@ func playerJoined (who):
 	if teams[2]["playerCount"] < teams[1]["playerCount"]:
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
+	teams[playerTeam]["playerNames"].append(Vars.getNameByID(who))
 	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
-	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
+	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "characterName": "Villager", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
 	for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
 	if started:
@@ -159,7 +161,7 @@ func dirtChanged (who, pos, team):
 func readyToGetObjects (who):
 	if ended:
 		main.rpc_id(who,"updateTeams",teams)
-		main.rpc_id(who,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]]})
+		main.rpc_id(who,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerNames": {1: teams[1]["playerNames"], 2: teams[2]["playerNames"]}, "yourCharacter": objects[who]["characterName"], "goldEarned": -1})
 		return
 	Vars.players[who]["inGame"] = true
 	playerFocused(who)
@@ -228,7 +230,15 @@ func endGame():
 	if teams[2]["score"] > teams[1]["score"]:
 		winner = 2
 	for i in playerIDS:
-		main.rpc_id(i,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]]})
+		var goldEarned = 0
+		if Vars.getNameByID(i) != "Guest":
+			var multiplier = 1
+			if objects[i]["data"]["team"] == winner:
+				multiplier = 2
+			goldEarned = (20 + int(randf() * 20)) * multiplier
+			Vars.accounts[Vars.accountsByIDs[i]]["gold"] += goldEarned
+		main.rpc_id(i,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerNames": {1: teams[1]["playerNames"], 2: teams[2]["playerNames"]}, "yourCharacter": objects[i]["characterName"], "goldEarned": int(goldEarned)})
+	Vars.saveAccounts()
 	Vars.logInfo("Game ended on room " + str(id))
 
 func removeRoom (msg):
