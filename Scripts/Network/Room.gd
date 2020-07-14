@@ -33,11 +33,12 @@ func ready():
 
 func findNewRoomMaster ():
 	var rtn = -1
+	var curTime = OS.get_ticks_msec()
 	for i in playerIDS:
-		if playersFocused[i]:
-			if rtn == -1:
-				rtn = i
-			elif Vars.players[i]["ping"] < Vars.players[rtn]["ping"]:
+		if rtn == -1:
+			rtn = i
+		else:
+			if (curTime - Vars.players[i]["lastSeen"]) + 15 < (curTime - Vars.players[rtn]["lastSeen"]):
 				rtn = i
 	return rtn
 
@@ -47,6 +48,10 @@ func selectCharacter (who, which, characterName, skin):
 	objects[who]["data"]["skin"] = skin
 
 func update():
+	if roomMaster != -1:
+		if OS.get_ticks_msec() - Vars.players[roomMaster]["lastSeen"] > 90:
+			roomMaster = findNewRoomMaster()
+			broadcastRoomMaster()
 	if started == true && ended == false && Vars.time - gameStartedTime >= gameLength:
 		endGame()
 	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
@@ -58,6 +63,7 @@ func newUniqueObjectID():
 		uniqueObjectID += 1
 
 func objectCreated (who, obj, data):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	newUniqueObjectID()
 	data["id"] = uniqueObjectID
 	objects[uniqueObjectID] = {"object": obj, "data": data}
@@ -66,6 +72,7 @@ func objectCreated (who, obj, data):
 			main.rpc_id(i,"objectCreated",who, obj, data)
 
 func objectUpdated (who, obj, data):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(obj):
 		Vars.logError("Room " + str(id) + " had a objectUpdated, but that object doesn't exist anymore.")
 		return
@@ -76,6 +83,7 @@ func objectUpdated (who, obj, data):
 			main.rpc_id(i,"objectUpdated",who, obj, objects[obj]["data"])
 
 func objectRemoved (who, obj):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(obj):
 		Vars.logError("Room " + str(id) + " had a objectRemoved, but that object doesn't exist anymore.")
 		return
@@ -95,12 +103,14 @@ func playerUnfocused (who):
 		broadcastRoomMaster()
 
 func playerFocused (who):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	playersFocused[who] = true
 	if roomMaster == -1:
 		roomMaster = who
 		broadcastRoomMaster()
 
 func playerJoined (who):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	playerCount += 1
 	playerIDS.append(who)
 	playersFocused[who] = false
@@ -109,7 +119,7 @@ func playerJoined (who):
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
 	teams[playerTeam]["playerNames"].append(Vars.getNameByID(who))
-	Vars.players[who] = {"room": id, "ping": 0, "inGame": false}
+	Vars.players[who] = {"room": id, "inGame": false}
 	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "characterName": "Villager", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
 	for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
@@ -130,6 +140,7 @@ func startGame ():
 		main.rpc_id(i,"gameStarted")
 
 func dirtCreated (who, pos, team):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if team <= 0:
 		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
 		return
@@ -144,6 +155,7 @@ func dirtCreated (who, pos, team):
 			main.rpc_id(i,"dirtCreated",dirts[pos])
 
 func dirtChanged (who, pos, team):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if team <= 0:
 		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
 		return
@@ -159,6 +171,7 @@ func dirtChanged (who, pos, team):
 			main.rpc_id(i,"dirtChanged",dirts[pos])
 
 func readyToGetObjects (who):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if ended:
 		main.rpc_id(who,"updateTeams",teams)
 		main.rpc_id(who,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerNames": {1: teams[1]["playerNames"], 2: teams[2]["playerNames"]}, "yourCharacter": objects[who]["characterName"], "goldEarned": -1})
@@ -179,12 +192,9 @@ func readyToGetObjects (who):
 		if !("Characters" in objects[i]["object"]):
 			main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[i]["data"])
 
-func demandGameTime(who, unixTime, ping):
+func demandGameTime(who, unixTime):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if started:
-		Vars.players[who]["ping"] = ping
-		if roomMaster != -1 && Vars.players[roomMaster]["ping"] > Vars.players[who]["ping"] + 10:
-			roomMaster = who
-			broadcastRoomMaster()
 		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
 	elif selectionStarted:
 		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), unixTime)

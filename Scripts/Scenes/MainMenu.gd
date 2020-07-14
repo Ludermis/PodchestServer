@@ -111,9 +111,9 @@ remote func confirmBuild (who, build):
 		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") could not confirm their build. [" + build + " / " + Vars.build + "]")
 		rpc_id(who,"wrongBuild",Vars.build)
 
-remote func demandGameTime (who, unixTime, ping):
+remote func demandGameTime (who, unixTime):
 	if Vars.rooms.has(Vars.players[who]["room"]):
-		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime, ping)
+		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime)
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to demandGameTime but that room doesn't exists.")
 
