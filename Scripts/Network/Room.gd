@@ -38,6 +38,9 @@ func findNewRoomMaster ():
 		if rtn == -1:
 			rtn = i
 		else:
+			if !Vars.players[i].has("lastSeen"):
+				Vars.logError("Room " + str(id) + " had a findNewRoomMaster, but a player doesn't have lastSeen yet.")
+				continue
 			if (curTime - Vars.players[i]["lastSeen"]) + 15 < (curTime - Vars.players[rtn]["lastSeen"]):
 				rtn = i
 	return rtn
@@ -66,6 +69,8 @@ func objectCreated (who, obj, data):
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	newUniqueObjectID()
 	data["id"] = uniqueObjectID
+	if objects.has(data["id"]):
+		Vars.logError("Room " + str(id) + " had a objectCreated, but that id is not unique.")
 	objects[uniqueObjectID] = {"object": obj, "data": data}
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
@@ -110,6 +115,9 @@ func playerFocused (who):
 		broadcastRoomMaster()
 
 func playerJoined (who):
+	if playerIDS.has(who):
+		Vars.logError("Room " + str(id) + " had a playerJoined, but that player joined already.")
+		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	playerCount += 1
 	playerIDS.append(who)
@@ -203,7 +211,7 @@ func playerDisconnected (who):
 	leaveRoom(who)
 
 func leaveRoom (who):
-	if !objects.has(who):
+	if !playerIDS.has(who):
 		Vars.logError("Room " + str(id) + " had a leaveRoom, but that player doesn't exist in room.")
 		return
 	playerCount -= 1
