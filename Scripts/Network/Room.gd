@@ -52,9 +52,12 @@ func selectCharacter (who, which, characterName, skin):
 
 func update():
 	if roomMaster != -1:
-		if Vars.players[roomMaster].has("lastSeen") && OS.get_ticks_msec() - Vars.players[roomMaster]["lastSeen"] > 90:
-			roomMaster = findNewRoomMaster()
-			broadcastRoomMaster()
+		if Vars.players[roomMaster].has("lastSeen"):
+			if OS.get_ticks_msec() - Vars.players[roomMaster]["lastSeen"] > 90:
+				roomMaster = findNewRoomMaster()
+				broadcastRoomMaster()
+		else:
+			Vars.logError("Room " + str(id) + " had a update, but room master doesn't have lastSeen.")
 	if started == true && ended == false && Vars.time - gameStartedTime >= gameLength:
 		endGame()
 	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
