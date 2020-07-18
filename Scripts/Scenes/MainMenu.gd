@@ -56,8 +56,11 @@ remote func buyFromStore (who, what):
 		if Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"].has(what["character"]) && Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].has(what["item"]):
 			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that skin.")
 			return
-		if Vars.accounts[Vars.accountsByIDs[who]][Vars.store["skins"][what["character"]][what["item"]]["priceType"]] >= Vars.store["skins"][what["character"]][what["item"]]["price"]:
-			Vars.accounts[Vars.accountsByIDs[who]][Vars.store["skins"][what["character"]][what["item"]]["priceType"]] -= Vars.store["skins"][what["character"]][what["item"]]["price"]
+		if !Vars.store["skins"][what["character"]][what["item"]].has(what["currency"]):
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but that skin is not sold with that currency.")
+			return
+		if Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] >= Vars.store["skins"][what["character"]][what["item"]][what["currency"]]:
+			Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] -= Vars.store["skins"][what["character"]][what["item"]][what["currency"]]
 			if Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"].has(what["character"]):
 				Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].append(what["item"])
 			else:
@@ -68,8 +71,11 @@ remote func buyFromStore (who, what):
 		if Vars.accounts[Vars.accountsByIDs[who]]["ownedCharacters"].has(what["item"]):
 			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that character.")
 			return
-		if Vars.accounts[Vars.accountsByIDs[who]]["gold"] >= Vars.store["characters"][what["character"]]["priceGold"]:
-			Vars.accounts[Vars.accountsByIDs[who]]["gold"] -= Vars.store["characters"][what["character"]]["priceGold"]
+		if !Vars.store["characters"][what["character"]].has(what["currency"]):
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but that character is not sold with that currency.")
+			return
+		if Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] >= Vars.store["characters"][what["character"]][what["currency"]]:
+			Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] -= Vars.store["characters"][what["character"]][what["currency"]]
 			Vars.accounts[Vars.accountsByIDs[who]]["ownedCharacters"].append(what["item"])
 			rpc_id(who,"accountInfoRefreshed",Vars.accounts[Vars.accountsByIDs[who]])
 			rpc_id(who,"buySuccessful")

@@ -12,11 +12,11 @@ var build = "11"
 
 var store = {
 	"characters": {
-			"Xedarin": {"priceGold": 450, "priceAP": 260},
-			"Mold": {"priceGold": 1350, "priceAP": 260}
+			"Xedarin": {"gold": 450, "AP": 260},
+			"Mold": {"gold": 1350, "AP": 260}
 		},
 	"skins": {
-			"Villager": {"Villagernaut": {"price": 1350,"priceType": "AP"}}
+			"Villager": {"Villagernaut": {"AP": 1350}}
 		}
 }
 
