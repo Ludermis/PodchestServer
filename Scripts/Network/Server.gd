@@ -14,7 +14,6 @@ func startServer():
 	get_tree().connect("network_peer_connected", self, "playerConnected")
 	get_tree().connect("network_peer_disconnected", self, "playerDisconnected")
 	Vars.logInfo("Server started!")
-	
 
 func _process(delta):
 	if server.is_listening():

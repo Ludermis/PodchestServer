@@ -165,6 +165,26 @@ remote func objectRemoved (who, obj):
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectRemoved but that room doesn't exists.")
 
+remote func demandAdminInfo (who):
+	if !Vars.accountsByIDs.has(who):
+		Vars.logError("User " + str(who) + " called demandAdminInfo, but is not logged in.")
+		return
+	if Vars.accounts[Vars.accountsByIDs[who]]["auth"] < 100:
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") called demandAdminInfo but their auth level is not enough.")
+		return
+	
+	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") entered admin panel.")
+	var dict = {"currentLog": ""}
+	
+	var logName = Vars.currentDateToStringMinimal() + ".txt"
+	var f = File.new()
+	if f.file_exists(Vars.logsFolder + logName):
+		f.open(Vars.logsFolder + logName,File.READ)
+		dict["currentLog"] = f.get_as_text()
+		f.close()
+	
+	rpc_id(who,"gotAdminInfo",dict)
+
 remote func registerAccount (who, username, password):
 	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to register a account with " + username + ":" + password)
 	if Vars.accounts.has(username):

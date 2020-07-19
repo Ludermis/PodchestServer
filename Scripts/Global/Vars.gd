@@ -8,7 +8,9 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "12"
+var build = "13"
+var accountsFileLocation = "user://accounts.txt"
+var logsFolder = "user://logs/"
 
 var store = {
 	"characters": {
@@ -21,7 +23,10 @@ var store = {
 }
 
 func _ready():
-	pass
+	var dir = Directory.new()
+	if !dir.dir_exists(logsFolder):
+		dir.open("user://")
+		dir.make_dir("logs")
 
 func _process(delta):
 	pass
@@ -44,19 +49,68 @@ func currentTimeToString ():
 		sS = "0" + sS
 	return str("[",hS,":",mS,":",sS,"]")
 
+func currentDateToString ():
+	var dateDict = OS.get_datetime();
+	var mS = str(dateDict.day)
+	var sS = str(dateDict.month)
+	if dateDict.day < 10:
+		mS = "0" + mS
+	if dateDict.month < 10:
+		sS = "0" + sS
+	return str("[",mS,".",sS,".",dateDict.year,"]")
+
+func currentDateToStringMinimal ():
+	var dateDict = OS.get_datetime();
+	var mS = str(dateDict.day)
+	var sS = str(dateDict.month)
+	if dateDict.day < 10:
+		mS = "0" + mS
+	if dateDict.month < 10:
+		sS = "0" + sS
+	return str(mS,"-",sS,"-",dateDict.year)
+
 func logInfo (msg):
-	print ("[INFO] " + currentTimeToString() + " " + msg)
+	var txt = "[INFO] " + currentDateToString() + " " + currentTimeToString() + " " + msg
+	print (txt)
+	
+	var logName = currentDateToStringMinimal() + ".txt"
+	
+	var save = File.new()
+	
+	if !save.file_exists(logsFolder + logName):
+		save.open(logsFolder + logName,File.WRITE)
+		save.close()
+	
+	save.open(logsFolder + logName,File.READ_WRITE)
+	save.seek_end()
+	save.store_line(txt)
+	save.close()
 
 func logError (msg):
-	print ("[ERROR] " + currentTimeToString() + " " + msg)
+	var txt = "[ERROR] " + currentDateToString() + " " + currentTimeToString() + " " + msg
+	print (txt)
+	
+	var logName = currentDateToStringMinimal() + ".txt"
+	
+	var save = File.new()
+	
+	if !save.file_exists(logsFolder + logName):
+		save.open(logsFolder + logName,File.WRITE)
+		save.close()
+	
+	save.open(logsFolder + logName,File.READ_WRITE)
+	save.seek_end()
+	save.store_line(txt)
+	save.close()
 
 func getTime() -> float:
 	return OS.get_ticks_msec() / 1000.0
 
 func saveAccounts ():
 	var save = File.new()
-	save.open("user://accounts.txt",File.WRITE)
+	save.open(accountsFileLocation,File.WRITE)
 	save.store_string(JSON.print(accounts, " "))
+	save.close()
 
 func optimizeVector(pos, opt):
 	var newv = Vector2.ZERO;
@@ -84,14 +138,17 @@ func accountInfoCompleter(acc):
 	if !accounts[acc].has("ownedSkins"):
 		accounts[acc]["ownedSkins"] = {}
 		needSave = true
+	if !accounts[acc].has("auth"):
+		accounts[acc]["auth"] = 1
+		needSave = true
 	if needSave:
 		Vars.saveAccounts()
 
 func loadAccounts():
 	var save = File.new()
-	if not save.file_exists("user://accounts.txt"):
+	if not save.file_exists(accountsFileLocation):
 		return
-	save.open("user://accounts.txt", File.READ)
+	save.open(accountsFileLocation, File.READ)
 	var data = JSON.parse(save.get_as_text()).result
 	save.close()
 	accounts = data
