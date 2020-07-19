@@ -174,13 +174,14 @@ remote func demandAdminInfo (who):
 		return
 	
 	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") entered admin panel.")
-	var dict = {"currentLog": ""}
+	var dict = {"serverDate": Vars.currentDateToStringMinimal(),"logs": {}}
 	
-	var logName = Vars.currentDateToStringMinimal() + ".txt"
-	var f = File.new()
-	if f.file_exists(Vars.logsFolder + logName):
-		f.open(Vars.logsFolder + logName,File.READ)
-		dict["currentLog"] = f.get_as_text()
+	var files = Vars.listFiles(Vars.logsFolder)
+	files.invert()
+	for i in files:
+		var f = File.new()
+		f.open(Vars.logsFolder + i,File.READ)
+		dict["logs"][i.trim_suffix(".txt")] = f.get_as_text()
 		f.close()
 	
 	rpc_id(who,"gotAdminInfo",dict)

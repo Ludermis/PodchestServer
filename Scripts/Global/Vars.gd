@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "13"
+var build = "14"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 
@@ -68,6 +68,23 @@ func currentDateToStringMinimal ():
 	if dateDict.month < 10:
 		sS = "0" + sS
 	return str(mS,"-",sS,"-",dateDict.year)
+
+func listFiles(path):
+	var files = []
+	var dir = Directory.new()
+	dir.open(path)
+	dir.list_dir_begin()
+
+	while true:
+		var file = dir.get_next()
+		if file == "":
+			break
+		elif not file.begins_with("."):
+			files.append(file)
+
+	dir.list_dir_end()
+
+	return files
 
 func logInfo (msg):
 	var txt = "[INFO] " + currentDateToString() + " " + currentTimeToString() + " " + msg
