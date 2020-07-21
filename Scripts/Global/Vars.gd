@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "16"
+var build = "17"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 
