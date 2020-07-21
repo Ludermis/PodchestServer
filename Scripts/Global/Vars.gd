@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "17"
+var build = "18"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 
@@ -83,7 +83,7 @@ func listFiles(path):
 			files.append(file)
 
 	dir.list_dir_end()
-
+	files.sort()
 	return files
 
 func logInfo (msg):

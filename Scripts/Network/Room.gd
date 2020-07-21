@@ -41,7 +41,7 @@ func findNewRoomMaster ():
 			if !Vars.players[i].has("lastSeen") || !Vars.players[rtn].has("lastSeen"):
 				Vars.logError("Room " + str(id) + " had a findNewRoomMaster, but a player doesn't have lastSeen yet.")
 				continue
-			if (curTime - Vars.players[i]["lastSeen"]) + 15 < (curTime - Vars.players[rtn]["lastSeen"]):
+			if (curTime - Vars.players[i]["lastSeen"]) + 7 < (curTime - Vars.players[rtn]["lastSeen"]):
 				rtn = i
 	return rtn
 
@@ -53,7 +53,7 @@ func selectCharacter (who, which, characterName, skin):
 func update():
 	if roomMaster != -1:
 		if Vars.players[roomMaster].has("lastSeen"):
-			if OS.get_ticks_msec() - Vars.players[roomMaster]["lastSeen"] > 90:
+			if OS.get_ticks_msec() - Vars.players[roomMaster]["lastSeen"] > 45:
 				roomMaster = findNewRoomMaster()
 				broadcastRoomMaster()
 		else:
