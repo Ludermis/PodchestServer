@@ -27,8 +27,8 @@ var mapSizeY = 50
 
 func ready():
 	Vars.roomUniqueID += 1
-	teams[1] = {"color": Color.from_hsv(randf(),1.0,1.0), "playerCount": 0, "score": 0, "playerNames": []}
-	teams[2] = {"color": teams[1]["color"].inverted(), "playerCount": 0, "score": 0, "playerNames": []}
+	teams[1] = {"color": Color.from_hsv(randf(),1.0,1.0), "playerCount": 0, "score": 0, "playerInfo": {}}
+	teams[2] = {"color": teams[1]["color"].inverted(), "playerCount": 0, "score": 0, "playerInfo": {}}
 	Vars.logInfo("Room " + str(id) + " created.")
 
 func findNewRoomMaster ():
@@ -121,6 +121,9 @@ func playerJoined (who):
 	if playerIDS.has(who):
 		Vars.logError("Room " + str(id) + " had a playerJoined, but that player joined already.")
 		return
+	if started || selectionStarted:
+		Vars.logError("Room " + str(id) + " had a playerJoined, but either game or selection started.")
+		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	playerCount += 1
 	playerIDS.append(who)
@@ -129,8 +132,8 @@ func playerJoined (who):
 	if teams[2]["playerCount"] < teams[1]["playerCount"]:
 		playerTeam = 2
 	teams[playerTeam]["playerCount"] += 1
-	teams[playerTeam]["playerNames"].append(Vars.getNameByID(who))
-	Vars.players[who] = {"room": id, "inGame": false}
+	teams[playerTeam]["playerInfo"][who] = {"name": Vars.getNameByID(who), "dirtCreatedScore": 0, "dirtChangedScore": 0}
+	Vars.players[who]["room"] = id
 	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "characterName": "Villager", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
 	for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
@@ -150,7 +153,7 @@ func startGame ():
 	for i in playerIDS:
 		main.rpc_id(i,"gameStarted")
 
-func dirtCreated (who, pos, team):
+func dirtCreated (who, painter, pos, team):
 	if ended:
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
@@ -163,11 +166,15 @@ func dirtCreated (who, pos, team):
 	dirtCount += 1
 	dirts[pos] = {"position": pos, "color": teams[team]["color"], "team": team}
 	teams[dirts[pos]["team"]]["score"] += 1
+	if team == objects[painter]["data"]["team"]:
+		teams[objects[painter]["data"]["team"]]["playerInfo"][painter]["dirtCreatedScore"] += 1
+	else:
+		teams[objects[painter]["data"]["team"]]["playerInfo"][painter]["dirtCreatedScore"] -= 1
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
 			main.rpc_id(i,"dirtCreated",dirts[pos])
 
-func dirtChanged (who, pos, team):
+func dirtChanged (who, painter, pos, team):
 	if ended:
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
@@ -177,10 +184,17 @@ func dirtChanged (who, pos, team):
 	if !dirts.has(pos):
 		Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
 		return
+	if dirts[pos]["team"] == team:
+		#Vars.logError("Room " + str(id) + " had a dirtChanged, but the dirt is already that color.")
+		return
 	teams[dirts[pos]["team"]]["score"] -= 1
 	dirts[pos]["color"] = teams[team]["color"]
 	dirts[pos]["team"] = team
 	teams[dirts[pos]["team"]]["score"] += 1
+	if team == objects[painter]["data"]["team"]:
+		teams[objects[painter]["data"]["team"]]["playerInfo"][painter]["dirtChangedScore"] += 1
+	else:
+		teams[objects[painter]["data"]["team"]]["playerInfo"][painter]["dirtChangedScore"] -= 1
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
 			main.rpc_id(i,"dirtChanged",dirts[pos])
@@ -221,10 +235,14 @@ func leaveRoom (who):
 	if !playerIDS.has(who):
 		Vars.logError("Room " + str(id) + " had a leaveRoom, but that player doesn't exist in room.")
 		return
+	Vars.players[who]["room"] = -1
+	Vars.players[who]["inGame"] = false
 	playerCount -= 1
 	playerIDS.erase(who)
 	playersFocused.erase(who)
-	teams[objects[who]["data"]["team"]]["playerCount"] -= 1
+	if !started:
+		teams[objects[who]["data"]["team"]]["playerCount"] -= 1
+		teams[objects[who]["data"]["team"]]["playerInfo"].erase(who)
 	objects.erase(who)
 	if roomMaster == who:
 		roomMaster = findNewRoomMaster()
@@ -254,6 +272,19 @@ func endGame():
 		winner = 1
 	if teams[2]["score"] > teams[1]["score"]:
 		winner = 2
+	
+	for t in range(1,2 + 1):
+		for i in teams[t]["playerInfo"]:
+			var pName = teams[t]["playerInfo"][i]["name"]
+			if pName == "Guest":
+				continue
+			if winner == -1:
+				Vars.accounts[pName]["draws"] += 1
+			elif winner == t:
+				Vars.accounts[pName]["wins"] += 1
+			else:
+				Vars.accounts[pName]["loses"] += 1
+	
 	for i in playerIDS:
 		var goldEarned = 0
 		if Vars.getNameByID(i) != "Guest":
@@ -262,7 +293,7 @@ func endGame():
 				multiplier = 2
 			goldEarned = (20 + int(randf() * 20)) * multiplier
 			Vars.accounts[Vars.accountsByIDs[i]]["gold"] += goldEarned
-		main.rpc_id(i,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerNames": {1: teams[1]["playerNames"], 2: teams[2]["playerNames"]}, "yourCharacter": objects[i]["characterName"], "goldEarned": int(goldEarned)})
+		main.rpc_id(i,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerInfos": {1: teams[1]["playerInfo"], 2: teams[2]["playerInfo"]}, "yourCharacter": objects[i]["characterName"], "goldEarned": int(goldEarned)})
 	Vars.saveAccounts()
 	Vars.logInfo("Game ended on room " + str(id))
 

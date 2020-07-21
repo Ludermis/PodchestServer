@@ -21,7 +21,7 @@ func _process(delta):
 
 func playerConnected (id):
 	Vars.playerCount += 1
-	Vars.players[id] = {"room": -1, "lastSeen": OS.get_ticks_msec()}
+	Vars.players[id] = {"room": -1, "lastSeen": OS.get_ticks_msec(), "inGame": false}
 	Vars.logInfo(str("User ", id, " (", Vars.getNameByID(id), ") connected with IP : " , server.get_peer_address(id)))
 
 func playerDisconnected (id):

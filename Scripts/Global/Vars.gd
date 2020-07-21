@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "14"
+var build = "15"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 
@@ -157,6 +157,15 @@ func accountInfoCompleter(acc):
 		needSave = true
 	if !accounts[acc].has("auth"):
 		accounts[acc]["auth"] = 1
+		needSave = true
+	if !accounts[acc].has("wins"):
+		accounts[acc]["wins"] = 0
+		needSave = true
+	if !accounts[acc].has("loses"):
+		accounts[acc]["loses"] = 0
+		needSave = true
+	if !accounts[acc].has("draws"):
+		accounts[acc]["draws"] = 0
 		needSave = true
 	if needSave:
 		Vars.saveAccounts()
