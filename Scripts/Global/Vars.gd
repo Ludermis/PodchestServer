@@ -8,14 +8,14 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "18"
+var build = "19"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 
 var store = {
 	"characters": {
-			"Xedarin": {"gold": 450, "AP": 260},
-			"Mold": {"gold": 1350, "AP": 260}
+			"Xedarin": {"gold": 450, "AP": 260}
+			#"Mold": {"gold": 1350, "AP": 260}
 		},
 	"skins": {
 			"Villager": {"Villagernaut": {"AP": 1350}}
@@ -74,14 +74,12 @@ func listFiles(path):
 	var dir = Directory.new()
 	dir.open(path)
 	dir.list_dir_begin()
-
 	while true:
 		var file = dir.get_next()
 		if file == "":
 			break
 		elif not file.begins_with("."):
 			files.append(file)
-
 	dir.list_dir_end()
 	files.sort()
 	return files

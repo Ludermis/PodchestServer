@@ -165,7 +165,7 @@ remote func objectRemoved (who, obj):
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectRemoved but that room doesn't exists.")
 
-remote func demandAdminInfo (who):
+remote func demandAdminInfo (who, demand):
 	if !Vars.accountsByIDs.has(who):
 		Vars.logError("User " + str(who) + " called demandAdminInfo, but is not logged in.")
 		return
@@ -173,18 +173,24 @@ remote func demandAdminInfo (who):
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") called demandAdminInfo but their auth level is not enough.")
 		return
 	
-	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") entered admin panel.")
-	var dict = {"serverDate": Vars.currentDateToStringMinimal(),"logs": {}}
-	
-	var files = Vars.listFiles(Vars.logsFolder)
-	files.invert()
-	for i in files:
+	if demand["type"] == "main":
+		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") entered admin panel.")
+		var dict = {"serverDate": Vars.currentDateToStringMinimal(),"logs": []}
+		
+		var files = Vars.listFiles(Vars.logsFolder)
+		files.invert()
+		for i in files:
+			dict["logs"].append((i.trim_suffix(".txt")))
+		rpc_id(who,"gotAdminInfo",demand,dict)
+	elif demand["type"] == "getLog":
+		var dict = {}
+		
 		var f = File.new()
-		f.open(Vars.logsFolder + i,File.READ)
-		dict["logs"][i.trim_suffix(".txt")] = f.get_as_text()
+		f.open(Vars.logsFolder + demand["which"] + ".txt",File.READ)
+		dict["log"] = f.get_as_text()
 		f.close()
-	
-	rpc_id(who,"gotAdminInfo",dict)
+		
+		rpc_id(who,"gotAdminInfo",demand,dict)
 
 remote func registerAccount (who, username, password):
 	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to register a account with " + username + ":" + password)
