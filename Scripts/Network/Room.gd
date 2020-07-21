@@ -38,7 +38,7 @@ func findNewRoomMaster ():
 		if rtn == -1:
 			rtn = i
 		else:
-			if !Vars.players[i].has("lastSeen"):
+			if !Vars.players[i].has("lastSeen") || !Vars.players[rtn].has("lastSeen"):
 				Vars.logError("Room " + str(id) + " had a findNewRoomMaster, but a player doesn't have lastSeen yet.")
 				continue
 			if (curTime - Vars.players[i]["lastSeen"]) + 15 < (curTime - Vars.players[rtn]["lastSeen"]):
@@ -151,6 +151,8 @@ func startGame ():
 		main.rpc_id(i,"gameStarted")
 
 func dirtCreated (who, pos, team):
+	if ended:
+		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if team <= 0:
 		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
@@ -166,6 +168,8 @@ func dirtCreated (who, pos, team):
 			main.rpc_id(i,"dirtCreated",dirts[pos])
 
 func dirtChanged (who, pos, team):
+	if ended:
+		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if team <= 0:
 		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
