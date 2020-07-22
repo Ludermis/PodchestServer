@@ -88,7 +88,7 @@ func objectUpdated (who, obj, data):
 		objects[obj]["data"][i] = data[i]
 	for i in playerIDS:
 		if Vars.players[i]["inGame"] && i != who:
-			main.rpc_id(i,"objectUpdated",who, obj, objects[obj]["data"])
+			main.rpc_id(i,"objectUpdated",who, obj, data)
 
 func objectRemoved (who, obj):
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
