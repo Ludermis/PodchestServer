@@ -30,7 +30,7 @@ remote func playerJoined (who, msg):
 		else:
 			Vars.players[who]["room"] = foundRoom
 			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
-	if msg == "quick2v2":
+	elif msg == "quick2v2":
 		var foundRoom = -1
 		for i in Vars.rooms:
 			if Vars.rooms[i].started == false && Vars.rooms[i].selectionStarted == false && Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
@@ -43,6 +43,26 @@ remote func playerJoined (who, msg):
 			room.gameLength = 90
 			room.minPlayers = 4
 			room.maxPlayers = 4
+			room.ready()
+			Vars.rooms[room.id] = room
+			Vars.players[who]["room"] = room.id
+			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
+		else:
+			Vars.players[who]["room"] = foundRoom
+			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
+	elif msg == "quick3v3":
+		var foundRoom = -1
+		for i in Vars.rooms:
+			if Vars.rooms[i].started == false && Vars.rooms[i].selectionStarted == false && Vars.rooms[i].ended == false && Vars.rooms[i].type == msg && Vars.rooms[i].playerCount < Vars.rooms[i].maxPlayers:
+				foundRoom = Vars.rooms[i].id
+		if foundRoom == -1:
+			var room = preload("res://Scripts/Network/Room.gd").new()
+			room.main = get_tree().root.get_node("Main")
+			room.id = Vars.roomUniqueID
+			room.type = "quick3v3"
+			room.gameLength = 90
+			room.minPlayers = 6
+			room.maxPlayers = 6
 			room.ready()
 			Vars.rooms[room.id] = room
 			Vars.players[who]["room"] = room.id
