@@ -187,9 +187,22 @@ remote func demandAdminInfo (who, demand):
 		
 		var f = File.new()
 		f.open(Vars.logsFolder + demand["which"] + ".txt",File.READ)
-		dict["log"] = f.get_as_text()
+		var arr = []
+		while not f.eof_reached():
+			var line = f.get_line()
+			arr.append(line + "\n")
 		f.close()
-		
+		var totalChars = 0
+		var txt = ""
+		for i in arr:
+			totalChars += i.length()
+			txt += i
+			if totalChars > 20000:
+				dict["log"] = txt
+				rpc_id(who,"gotAdminInfo",demand,dict)
+				totalChars = 0
+				txt = ""
+		dict["log"] = txt
 		rpc_id(who,"gotAdminInfo",demand,dict)
 
 remote func registerAccount (who, username, password):

@@ -157,8 +157,8 @@ func dirtCreated (who, painter, pos, team):
 	if ended:
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
-	if team <= 0:
-		Vars.logError("Room " + str(id) + " had a dirtCreated, but that team doesn't exist.")
+	if !objects.has(painter):
+		#Vars.logError("Room " + str(id) + " had a dirtCreated, but painter doesn't exist.")
 		return
 	if dirts.has(pos):
 		#Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
@@ -178,8 +178,8 @@ func dirtChanged (who, painter, pos, team):
 	if ended:
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
-	if team <= 0:
-		Vars.logError("Room " + str(id) + " had a dirtChanged, but that team doesn't exist.")
+	if !objects.has(painter):
+		#Vars.logError("Room " + str(id) + " had a dirtChanged, but painter doesn't exist.")
 		return
 	if !dirts.has(pos):
 		Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
