@@ -134,7 +134,7 @@ func playerJoined (who):
 	teams[playerTeam]["playerCount"] += 1
 	teams[playerTeam]["playerInfo"][who] = {"name": Vars.getNameByID(who), "dirtCreatedScore": 0, "dirtChangedScore": 0}
 	Vars.players[who]["room"] = id
-	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "characterName": "Villager", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "modulate": teams[playerTeam]["color"].blend(Color(1,1,1,0.5)), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
+	objects[who] = {"object": "res://Prefabs/Characters/Villager.tscn", "characterName": "Villager", "data": {"id": who, "skin": "", "position": Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2), "team": playerTeam, "playerName": Vars.getNameByID(who)}}
 	for i in playerIDS:
 			main.rpc_id(i,"playerCountUpdated",playerCount,minPlayers)
 	if started:

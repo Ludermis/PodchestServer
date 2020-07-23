@@ -227,7 +227,7 @@ remote func demandAdminInfo (who, demand):
 
 remote func registerAccount (who, username, password):
 	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to register a account with " + username + ":" + password)
-	if username == "Guest":
+	if username == "Guest" || username == "Mold":
 		rpc_id(who,"registerFailed","Nice try.")
 		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") couldn't register the account because username " + username + " is system text.")
 	elif Vars.accounts.has(username):
