@@ -90,6 +90,15 @@ func objectUpdated (who, obj, data):
 		if Vars.players[i]["inGame"] && i != who:
 			main.rpc_id(i,"objectUpdated",who, obj, data)
 
+func objectCalled (who, obj, funcName, data):
+	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
+	if !objects.has(obj):
+		Vars.logError("Room " + str(id) + " had a objectCalled, but that object doesn't exist anymore.")
+		return
+	for i in playerIDS:
+		if Vars.players[i]["inGame"] && i != who:
+			main.rpc_id(i,"objectCalled",who, obj, funcName, data)
+
 func objectRemoved (who, obj):
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(obj):

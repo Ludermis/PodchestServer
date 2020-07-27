@@ -179,6 +179,12 @@ remote func objectUpdated (who, obj, data):
 	else:
 		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectUpdated but that room doesn't exists.")
 
+remote func objectCalled (who, obj, funcName, data):
+	if Vars.rooms.has(Vars.players[who]["room"]):
+		Vars.rooms[Vars.players[who]["room"]].objectCalled(who, obj, funcName, data)
+	else:
+		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCalled but that room doesn't exists.")
+
 remote func objectRemoved (who, obj):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectRemoved(who, obj)
