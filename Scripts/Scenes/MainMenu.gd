@@ -74,10 +74,12 @@ remote func playerJoined (who, msg):
 remote func buyFromStore (who, what):
 	if what["type"] == "skin":
 		if Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"].has(what["character"]) && Vars.accounts[Vars.accountsByIDs[who]]["ownedSkins"][what["character"]].has(what["item"]):
-			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that skin.")
+			if Vars.debugTextLevel >= 1:
+				Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that skin.")
 			return
 		if !Vars.store["skins"][what["character"]][what["item"]].has(what["currency"]):
-			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but that skin is not sold with that currency.")
+			if Vars.debugTextLevel >= 1:
+				Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but that skin is not sold with that currency.")
 			return
 		if Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] >= Vars.store["skins"][what["character"]][what["item"]][what["currency"]]:
 			Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] -= Vars.store["skins"][what["character"]][what["item"]][what["currency"]]
@@ -89,10 +91,12 @@ remote func buyFromStore (who, what):
 			rpc_id(who,"buySuccessful")
 	elif what["type"] == "character":
 		if Vars.accounts[Vars.accountsByIDs[who]]["ownedCharacters"].has(what["item"]):
-			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that character.")
+			if Vars.debugTextLevel >= 1:
+				Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but already has that character.")
 			return
 		if !Vars.store["characters"][what["character"]].has(what["currency"]):
-			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but that character is not sold with that currency.")
+			if Vars.debugTextLevel >= 1:
+				Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to buyFromStore but that character is not sold with that currency.")
 			return
 		if Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] >= Vars.store["characters"][what["character"]][what["currency"]]:
 			Vars.accounts[Vars.accountsByIDs[who]][what["currency"]] -= Vars.store["characters"][what["character"]][what["currency"]]
@@ -103,7 +107,8 @@ remote func buyFromStore (who, what):
 
 remote func demandAccountInfo (who):
 	if !Vars.accountsByIDs.has(who):
-		Vars.logError("User " + str(who) + "had a demandAccountInfo error")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + "had a demandAccountInfo error")
 	rpc_id(who,"accountInfoRefreshed",Vars.accounts[Vars.accountsByIDs[who]])
 
 remote func demandStore (who):
@@ -116,19 +121,22 @@ remote func playerFocused (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].playerFocused(who)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to playerFocused but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to playerFocused but that room doesn't exists.")
 
 remote func playerUnfocused (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].playerUnfocused(who)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) +") tried to playerUnfocused but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) +") tried to playerUnfocused but that room doesn't exists.")
 
 remote func leaveRoom (who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].leaveRoom(who)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to leaveRoom but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to leaveRoom but that room doesn't exists.")
 
 remote func confirmBuild (who, build):
 	if Vars.build == build:
@@ -141,64 +149,74 @@ remote func demandGameTime (who, unixTime):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].demandGameTime(who, unixTime)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to demandGameTime but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to demandGameTime but that room doesn't exists.")
 
 remote func readyToGetObjects(who):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].readyToGetObjects(who)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to readyToGetObjects but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to readyToGetObjects but that room doesn't exists.")
 
 remote func dirtCreated (who, painter, pos, team):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].dirtCreated(who,painter,pos,team)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtCreated but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtCreated but that room doesn't exists.")
 
 remote func dirtChanged (who, painter, pos, team):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].dirtChanged(who,painter,pos,team)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtChanged but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to dirtChanged but that room doesn't exists.")
 
 remote func objectCreated (who, obj, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectCreated(who, obj, data)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCreated but that room doesn't exists.")
 
 remote func selectCharacter (who, which, characterName, skin):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].selectCharacter(who, which, characterName, skin)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to selectCharacter but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to selectCharacter but that room doesn't exists.")
 
 remote func objectUpdated (who, obj, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectUpdated(who, obj, data)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectUpdated but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectUpdated but that room doesn't exists.")
 
 remote func objectCalled (who, obj, funcName, data):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectCalled(who, obj, funcName, data)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCalled but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCalled but that room doesn't exists.")
 
 remote func objectRemoved (who, obj):
 	if Vars.rooms.has(Vars.players[who]["room"]):
 		Vars.rooms[Vars.players[who]["room"]].objectRemoved(who, obj)
 	else:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectRemoved but that room doesn't exists.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectRemoved but that room doesn't exists.")
 
 remote func demandAdminInfo (who, demand):
 	if !Vars.accountsByIDs.has(who):
-		Vars.logError("User " + str(who) + " called demandAdminInfo, but is not logged in.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " called demandAdminInfo, but is not logged in.")
 		return
 	if Vars.accounts[Vars.accountsByIDs[who]]["auth"] < 100:
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") called demandAdminInfo but their auth level is not enough.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") called demandAdminInfo but their auth level is not enough.")
 		return
-	
 	if demand["type"] == "main":
 		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") entered admin panel.")
 		var dict = {"serverDate": Vars.currentDateToStringMinimal(),"logs": []}
@@ -247,7 +265,8 @@ remote func registerAccount (who, username, password):
 
 remote func logoutAccount (who):
 	if !Vars.accountsByIDs.has(who):
-		Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to logout, but is not logged in. WTF ?")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to logout, but is not logged in. WTF ?")
 	else:
 		Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") logged out from " + Vars.accountsByIDs[who] + " via manual logout")
 		Vars.IDsByAccounts.erase(Vars.accountsByIDs[who])

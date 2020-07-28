@@ -38,9 +38,6 @@ func findNewRoomMaster ():
 		if rtn == -1:
 			rtn = i
 		else:
-			if !Vars.players[i].has("lastSeen") || !Vars.players[rtn].has("lastSeen"):
-				Vars.logError("Room " + str(id) + " had a findNewRoomMaster, but a player doesn't have lastSeen yet.")
-				continue
 			if (curTime - Vars.players[i]["lastSeen"]) + 7 < (curTime - Vars.players[rtn]["lastSeen"]):
 				rtn = i
 	return rtn
@@ -56,8 +53,6 @@ func update():
 			if OS.get_ticks_msec() - Vars.players[roomMaster]["lastSeen"] > 45:
 				roomMaster = findNewRoomMaster()
 				broadcastRoomMaster()
-		else:
-			Vars.logError("Room " + str(id) + " had a update, but room master doesn't have lastSeen.")
 	if started == true && ended == false && Vars.time - gameStartedTime >= gameLength:
 		endGame()
 	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
@@ -73,7 +68,8 @@ func objectCreated (who, obj, data):
 	newUniqueObjectID()
 	data["id"] = uniqueObjectID
 	if objects.has(data["id"]):
-		Vars.logError("Room " + str(id) + " had a objectCreated, but that id is not unique.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a objectCreated, but that id is not unique.")
 	objects[uniqueObjectID] = {"object": obj, "data": data}
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
@@ -82,7 +78,8 @@ func objectCreated (who, obj, data):
 func objectUpdated (who, obj, data):
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(obj):
-		Vars.logError("Room " + str(id) + " had a objectUpdated, but that object doesn't exist anymore.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a objectUpdated, but that object doesn't exist anymore.")
 		return
 	for i in data.keys():
 		objects[obj]["data"][i] = data[i]
@@ -93,7 +90,8 @@ func objectUpdated (who, obj, data):
 func objectCalled (who, obj, funcName, data):
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(obj):
-		Vars.logError("Room " + str(id) + " had a objectCalled, but that object doesn't exist anymore.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a objectCalled, but that object doesn't exist anymore.")
 		return
 	for i in playerIDS:
 		if Vars.players[i]["inGame"] && i != who:
@@ -102,7 +100,8 @@ func objectCalled (who, obj, funcName, data):
 func objectRemoved (who, obj):
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(obj):
-		Vars.logError("Room " + str(id) + " had a objectRemoved, but that object doesn't exist anymore.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a objectRemoved, but that object doesn't exist anymore.")
 		return
 	objects.erase(obj)
 	for i in playerIDS:
@@ -128,10 +127,12 @@ func playerFocused (who):
 
 func playerJoined (who):
 	if playerIDS.has(who):
-		Vars.logError("Room " + str(id) + " had a playerJoined, but that player joined already.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a playerJoined, but that player joined already.")
 		return
 	if started || selectionStarted:
-		Vars.logError("Room " + str(id) + " had a playerJoined, but either game or selection started.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a playerJoined, but either game or selection started.")
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	playerCount += 1
@@ -167,10 +168,12 @@ func dirtCreated (who, painter, pos, team):
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(painter):
-		#Vars.logError("Room " + str(id) + " had a dirtCreated, but painter doesn't exist.")
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtCreated, but painter doesn't exist.")
 		return
 	if dirts.has(pos):
-		#Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
 		return
 	dirtCount += 1
 	dirts[pos] = {"position": pos, "color": teams[team]["color"], "team": team}
@@ -188,13 +191,16 @@ func dirtChanged (who, painter, pos, team):
 		return
 	Vars.players[who]["lastSeen"] = OS.get_ticks_msec()
 	if !objects.has(painter):
-		#Vars.logError("Room " + str(id) + " had a dirtChanged, but painter doesn't exist.")
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtChanged, but painter doesn't exist.")
 		return
 	if !dirts.has(pos):
-		Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
 		return
 	if dirts[pos]["team"] == team:
-		#Vars.logError("Room " + str(id) + " had a dirtChanged, but the dirt is already that color.")
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtChanged, but the dirt is already that color.")
 		return
 	teams[dirts[pos]["team"]]["score"] -= 1
 	dirts[pos]["color"] = teams[team]["color"]
@@ -242,7 +248,8 @@ func playerDisconnected (who):
 
 func leaveRoom (who):
 	if !playerIDS.has(who):
-		Vars.logError("Room " + str(id) + " had a leaveRoom, but that player doesn't exist in room.")
+		if Vars.debugTextLevel >= 1:
+			Vars.logError("Room " + str(id) + " had a leaveRoom, but that player doesn't exist in room.")
 		return
 	Vars.players[who]["room"] = -1
 	Vars.players[who]["inGame"] = false
