@@ -2,6 +2,8 @@ extends Node
 
 var main
 var room
+var body
+var shape
 var velocity = Vector2.ZERO
 var acceleration = 64
 var maxSpeed = 384
@@ -73,25 +75,26 @@ func anySkillIndicating ():
 			return true
 	return false
 
-func movementHandler ():
-#	if canMove:
-#		if Input.is_action_pressed('right'):
-#			velocity.x = min(velocity.x + acceleration, maxSpeed)
-#		elif Input.is_action_pressed('left'):
-#			velocity.x = max(velocity.x - acceleration, -maxSpeed)
-#		else:
-#			velocity.x = lerp(velocity.x,0,Vars.friction)
-#		if Input.is_action_pressed('down'):
-#			velocity.y = min(velocity.y + acceleration, maxSpeed)
-#		elif Input.is_action_pressed('up'):
-#			velocity.y = max(velocity.y - acceleration, -maxSpeed)
-#		else:
-#			velocity.y = lerp(velocity.y,0,Vars.friction)
-#	else:
-#		velocity.y = lerp(velocity.y,0,Vars.friction)
-#		velocity.x = lerp(velocity.x,0,Vars.friction)
-#	velocity = move_and_slide(velocity,Vector2.UP)
-	pass
+func movementHandler (delta):
+	if canMove:
+		if pressed["right"]:
+			velocity.x = min(velocity.x + acceleration, maxSpeed)
+		elif pressed["left"]:
+			velocity.x = max(velocity.x - acceleration, -maxSpeed)
+		else:
+			velocity.x = lerp(velocity.x,0,Vars.friction)
+		if pressed["down"]:
+			velocity.y = min(velocity.y + acceleration, maxSpeed)
+		elif pressed["up"]:
+			velocity.y = max(velocity.y - acceleration, -maxSpeed)
+		else:
+			velocity.y = lerp(velocity.y,0,Vars.friction)
+	else:
+		velocity.y = lerp(velocity.y,0,Vars.friction)
+		velocity.x = lerp(velocity.x,0,Vars.friction)
+	
+	Physics2DServer.body_set_state(body,Physics2DServer.BODY_STATE_LINEAR_VELOCITY,velocity)
+	position = Physics2DServer.body_get_state(body,Physics2DServer.BODY_STATE_TRANSFORM).origin
 
 func findNextDirection ():
 	if desiredDirection == direction:
@@ -124,11 +127,5 @@ func _on_DirectionTimer_timeout():
 	if animation == "walk" || animation == "idle":
 		findNextDirection()
 
-func readyCustom():
-	pass
-
-func _ready():
-	readyCustom()
-
-func _physics_process(delta):
+func init ():
 	pass

@@ -12,6 +12,7 @@ var build = "32"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 var debugTextLevel = 1
+var friction = 0.2
 
 var store = {
 	"characters": {

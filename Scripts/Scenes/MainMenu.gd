@@ -22,8 +22,8 @@ remote func playerJoined (who, msg):
 			room.id = Vars.roomUniqueID
 			room.type = "quick1v1"
 			room.gameLength = 90
-			room.ready()
 			Vars.rooms[room.id] = room
+			room.ready()
 			Vars.players[who]["room"] = room.id
 			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
 		else:
@@ -42,8 +42,8 @@ remote func playerJoined (who, msg):
 			room.gameLength = 90
 			room.minPlayers = 4
 			room.maxPlayers = 4
-			room.ready()
 			Vars.rooms[room.id] = room
+			room.ready()
 			Vars.players[who]["room"] = room.id
 			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
 		else:
@@ -62,8 +62,8 @@ remote func playerJoined (who, msg):
 			room.gameLength = 90
 			room.minPlayers = 6
 			room.maxPlayers = 6
-			room.ready()
 			Vars.rooms[room.id] = room
+			room.ready()
 			Vars.players[who]["room"] = room.id
 			Vars.rooms[Vars.players[who]["room"]].playerJoined(who)
 		else:

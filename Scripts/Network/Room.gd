@@ -22,9 +22,19 @@ var uniqueObjectID = 0
 var objects = {}
 var mapSizeX = 50
 var mapSizeY = 50
+var gridSize = 64
+var space : RID
+var roomBorders
 
 func ready():
 	Vars.roomUniqueID += 1
+	space = Physics2DServer.space_create()
+	Physics2DServer.space_set_active(space,true)
+	roomBorders = preload("res://Scripts/Misc/RoomBorders.gd").new()
+	roomBorders.position = Vector2(0,0)
+	roomBorders.room = id
+	roomBorders.main = main
+	roomBorders.init()
 	teams[1] = {"color": Color.from_hsv(randf(),1.0,1.0), "playerCount": 0, "score": 0, "playerInfo": {}}
 	teams[2] = {"color": teams[1]["color"].inverted(), "playerCount": 0, "score": 0, "playerInfo": {}}
 	Vars.logInfo("Room " + str(id) + " created.")
@@ -39,15 +49,16 @@ func selectCharacter (who, which, characterName, skin):
 	objects[who]["instance"]["id"] = who
 	objects[who]["instance"]["team"] = objects[who]["team"]
 	objects[who]["instance"]["playerName"] = Vars.getNameByID(who)
-	objects[who]["instance"]["position"] = Vector2(64 * mapSizeX / 2, -64 * mapSizeY / 2)
+	objects[who]["instance"]["position"] = Vector2(gridSize * mapSizeX / 2, -gridSize * mapSizeY / 2)
 
 func update(delta):
 	if started == true && ended == false && Vars.time - gameStartedTime >= gameLength:
 		endGame()
 	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
 		startGame()
-	for i in objects:
-		objects[i]["instance"].update(delta)
+	if started && !ended:
+		for i in objects:
+			objects[i]["instance"].update(delta)
 
 func newUniqueObjectID():
 	uniqueObjectID += 1
@@ -102,6 +113,8 @@ func startGame ():
 	started = true
 	gameStartedTime = Vars.time
 	Vars.logInfo("Game started on room " + str(id) + " with " + str(playerCount) + " players.")
+	for i in objects:
+		objects[i]["instance"].init()
 	for i in playerIDS:
 		main.rpc_id(i,"gameStarted")
 
@@ -119,8 +132,7 @@ func readyToGetObjects (who):
 	for i in dirts:
 		main.rpc_id(who,"dirtCreated",dirts[i])
 	for i in playerIDS:
-		if Vars.players[i]["inGame"]:
-			main.rpc_id(who,"playerJoined",i,objects[i]["object"],objects[i]["instance"].getSharedData())
+		main.rpc_id(who,"playerJoined",i,objects[i]["object"],objects[i]["instance"].getSharedData())
 	for i in objects:
 		if !("Characters" in objects[i]["object"]):
 			main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[who]["instance"].getSharedData())
