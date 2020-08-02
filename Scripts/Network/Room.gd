@@ -118,6 +118,47 @@ func startGame ():
 	for i in playerIDS:
 		main.rpc_id(i,"gameStarted")
 
+func dirtCreated (painter, pos, team):
+	if ended:
+		return
+	if dirts.has(pos):
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtCreated, but a dirt already exist there.")
+		return
+	dirtCount += 1
+	dirts[pos] = {"position": pos, "color": teams[team]["color"], "team": team}
+	teams[dirts[pos]["team"]]["score"] += 1
+	if team == objects[painter]["instance"]["team"]:
+		teams[objects[painter]["instance"]["team"]]["playerInfo"][painter]["dirtCreatedScore"] += 1
+	else:
+		teams[objects[painter]["instance"]["team"]]["playerInfo"][painter]["dirtCreatedScore"] -= 1
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"dirtCreated",dirts[pos])
+
+func dirtChanged (painter, pos, team):
+	if ended:
+		return
+	if !dirts.has(pos):
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtChanged, but there is no dirt there.")
+		return
+	if dirts[pos]["team"] == team:
+		if Vars.debugTextLevel >= 2:
+			Vars.logError("Room " + str(id) + " had a dirtChanged, but the dirt is already that color.")
+		return
+	teams[dirts[pos]["team"]]["score"] -= 1
+	dirts[pos]["color"] = teams[team]["color"]
+	dirts[pos]["team"] = team
+	teams[dirts[pos]["team"]]["score"] += 1
+	if team == objects[painter]["instance"]["team"]:
+		teams[objects[painter]["instance"]["team"]]["playerInfo"][painter]["dirtChangedScore"] += 1
+	else:
+		teams[objects[painter]["instance"]["team"]]["playerInfo"][painter]["dirtChangedScore"] -= 1
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"dirtChanged",dirts[pos])
+
 func readyToGetObjects (who):
 	if ended:
 		main.rpc_id(who,"updateTeams",teams)

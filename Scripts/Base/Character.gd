@@ -11,7 +11,7 @@ var position
 var id
 var team = -1
 var canMove = true
-var animation = "idle"
+var animation = "downIdle"
 var desiredDirection = "down"
 var direction = "down"
 var playerName = "Guest"
@@ -24,6 +24,11 @@ var impacts = {}
 var uniqueImpactID = 0
 var animationsCantStop = ["rooted","rootedEnd"]
 var pressed = {"right": false, "left": false, "up": false, "down": false}
+
+var directionTimer = 0.1
+var directionTimerLeft = directionTimer
+var dirtTimer = 0.1
+var dirtTimerLeft = dirtTimer
 
 func newUniqueImpactID ():
 	uniqueImpactID += 1
@@ -43,25 +48,12 @@ func impactSystem (delta):
 	for i in impacts:
 		impacts[i].update(delta)
 
-func setDesiredDirection (dir):
-	desiredDirection = dir
-
-func setAnimation (anim):
-	animation = anim
-
 func skillSystem (delta):
 	for i in skills:
 		skills[i].update(delta)
 
 func useSkill (which):
 	skills[which].use()
-
-func updateSkillInfo (which, data):
-	for i in data:
-		skills[which].set(i,data[i])
-
-func skillCalled (which, funcName, data):
-	skills[which].callv(funcName,data)
 
 func anySkillCasting ():
 	for i in skills:
@@ -116,16 +108,38 @@ func findNextDirection ():
 	direction = directionsInt[next]
 
 func _on_DirtTimer_timeout():
-#	var vec = Vars.optimizeVector(position + Vector2(32,32),64)
-#	if !Vars.dirts.has(vec):
-#		Vars.tryPlaceDirt(Client.selfPeerID,id,vec,team)
-#	elif Vars.dirts[vec].team != team:
-#		Vars.tryChangeDirt(Client.selfPeerID,id,vec,team)
+	var vec = Vars.optimizeVector(position + Vector2(32,32),64)
+	if !Vars.rooms[room].dirts.has(vec):
+		Vars.tryPlaceDirt(room,id,vec,team)
+	elif Vars.rooms[room].dirts[vec].team != team:
+		Vars.tryChangeDirt(room,id,vec,team)
 	pass
 
+func inputHandler (delta):
+	if canMove:
+		if pressed["down"] && !pressed["right"] && !pressed["left"]:
+			desiredDirection = "down"
+		elif pressed["up"] && !pressed["right"] && !pressed["left"]:
+			desiredDirection = "up"
+		elif pressed["right"] && !pressed["up"] && !pressed["down"]:
+			desiredDirection = "right"
+		elif pressed["left"] && !pressed["up"] && !pressed["down"]:
+			desiredDirection = "left"
+		elif pressed["right"] && pressed["up"]:
+			desiredDirection = "upRight"
+		elif pressed["left"] && pressed["up"]:
+			desiredDirection = "upLeft"
+		elif pressed["right"] && pressed["down"]:
+			desiredDirection = "downRight"
+		elif pressed["left"] && pressed["down"]:
+			desiredDirection = "downLeft"
+
 func _on_DirectionTimer_timeout():
-	if animation == "walk" || animation == "idle":
-		findNextDirection()
+	findNextDirection()
+	if canMove && (pressed["left"] || pressed["right"] || pressed["up"] || pressed["down"]):
+		animation = direction + "Walk"
+	elif canMove:
+		animation = direction + "Idle"
 
 func init ():
 	pass

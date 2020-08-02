@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "32"
+var build = "33"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 var debugTextLevel = 1
@@ -140,6 +140,16 @@ func optimizeVector(pos, opt):
 	newv.x = pos.x - nx
 	newv.y = pos.y - ny;
 	return newv;
+
+func tryPlaceDirt (room, painter, pos, team):
+	if pos.x < 0 || pos.y < -(rooms[room].mapSizeY - 1) * 64 || pos.x > (rooms[room].mapSizeX - 1) * 64 || pos.y > 0:
+		return
+	rooms[room].dirtCreated(painter,pos,team)
+
+func tryChangeDirt (room, painter, pos, team):
+	if pos.x < 0 || pos.y < -(rooms[room].mapSizeY - 1) * 64 || pos.x > (rooms[room].mapSizeX - 1) * 64 || pos.y > 0:
+		return
+	rooms[room].dirtChanged(painter,pos,team)
 
 func accountInfoCompleter(acc):
 	var needSave = false

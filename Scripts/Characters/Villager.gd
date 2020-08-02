@@ -9,11 +9,24 @@ func getSharedData ():
 	data["skin"] = skin
 	data["team"] = team
 	data["playerName"] = playerName
+	data["animation"] = animation
 	data["id"] = id
 	return data
 
 func update (delta):
+	inputHandler(delta)
 	movementHandler(delta)
+	
+	# Timers
+	directionTimerLeft -= delta
+	if directionTimerLeft <= 0:
+		_on_DirectionTimer_timeout()
+		directionTimerLeft = directionTimer
+	
+	dirtTimerLeft -= delta
+	if dirtTimerLeft <= 0:
+		_on_DirtTimer_timeout()
+		dirtTimerLeft = dirtTimer
 	
 	for i in Vars.rooms[room].playerIDS:
 		main.rpc_id(i,"objectUpdated",-1,id,getSharedData())
