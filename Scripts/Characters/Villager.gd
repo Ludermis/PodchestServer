@@ -16,23 +16,26 @@ func getSharedData ():
 func update (delta):
 	inputHandler(delta)
 	movementHandler(delta)
-	
-	# Timers
-	directionTimerLeft -= delta
-	if directionTimerLeft <= 0:
-		_on_DirectionTimer_timeout()
-		directionTimerLeft = directionTimer
-	
-	dirtTimerLeft -= delta
-	if dirtTimerLeft <= 0:
-		_on_DirtTimer_timeout()
-		dirtTimerLeft = dirtTimer
+	skillSystem(delta)
+	for i in timers:
+		timers[i].update(delta)
 	
 	for i in Vars.rooms[room].playerIDS:
-		main.rpc_id(i,"objectUpdated",-1,id,getSharedData())
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"objectUpdated",-1,id,getSharedData())
 
 func init():
 	characterName = "Villager"
+	newUniqueTimerID()
+	timers[uniqueTimerID] = CustomTimer.new()
+	timers[uniqueTimerID].time = 0.1
+	timers[uniqueTimerID].connect("timeout",self,"_on_DirectionTimer_timeout")
+	timers[uniqueTimerID].start()
+	newUniqueTimerID()
+	timers[uniqueTimerID] = CustomTimer.new()
+	timers[uniqueTimerID].time = 0.1
+	timers[uniqueTimerID].connect("timeout",self,"_on_DirtTimer_timeout")
+	timers[uniqueTimerID].start()
 	body = Physics2DServer.body_create()
 	Physics2DServer.body_set_mode(body, Physics2DServer.BODY_MODE_CHARACTER)
 	shape = CircleShape2D.new()
@@ -43,3 +46,8 @@ func init():
 	Physics2DServer.body_set_collision_layer(body, 1)
 	Physics2DServer.body_set_collision_mask(body, 0)
 	Physics2DServer.body_set_state(body, Physics2DServer.BODY_STATE_TRANSFORM, Transform2D(0, Vector2(position.x, position.y)))
+	
+	skills[1] = preload("res://Scripts/Skills/Villager/VillagerQSkill.gd").new()
+	skills[1].id = 1
+	skills[1].main = main
+	skills[1].characterScript = self

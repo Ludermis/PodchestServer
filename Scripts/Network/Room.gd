@@ -78,6 +78,7 @@ func objectCalled (who, obj, funcName, data):
 		if Vars.debugTextLevel >= 1:
 			Vars.logError("Room " + str(id) + " had a objectCalled, but that object doesn't exist anymore.")
 		return
+	objects[obj]["instance"].callv(funcName,data)
 
 func playerJoined (who):
 	if playerIDS.has(who):
@@ -166,7 +167,8 @@ func readyToGetObjects (who):
 		return
 	Vars.players[who]["inGame"] = true
 	for i in playerIDS:
-		main.rpc_id(i,"updateTeams",teams)
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"updateTeams",teams)
 	for i in playerIDS:
 		if Vars.players[i]["inGame"] && i != who:
 			main.rpc_id(i,"playerJoined",who,objects[who]["object"],objects[who]["instance"].getSharedData())
@@ -199,7 +201,7 @@ func leaveRoom (who):
 	if !started:
 		teams[objects[who]["instance"]["team"]]["playerCount"] -= 1
 		teams[objects[who]["instance"]["team"]]["playerInfo"].erase(who)
-	objects.erase(who)
+		objects.erase(who)
 	
 	if started && ended == false:
 		for i in playerIDS:
@@ -251,5 +253,8 @@ func endGame():
 	Vars.logInfo("Game ended on room " + str(id))
 
 func removeRoom (msg):
+	roomBorders.destroy()
+	for i in objects:
+		objects[i]["instance"].destroy()
 	Vars.rooms.erase(id)
 	Vars.logInfo(msg)

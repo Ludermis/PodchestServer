@@ -11,6 +11,7 @@ func _process(delta):
 
 remote func playerJoined (who, msg):
 	Vars.logInfo("User " + str(who) + " (" + Vars.getNameByID(who) + ") called playerJoined with " + msg)
+	Vars.players[who]["inGame"] = false
 	if msg == "quick1v1":
 		var foundRoom = -1
 		for i in Vars.rooms:

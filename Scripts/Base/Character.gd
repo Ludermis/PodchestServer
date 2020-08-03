@@ -22,8 +22,10 @@ var directionsString = {"down": 1,"downRight": 2,"right": 3,"upRight": 4,"up": 5
 var skills = {}
 var impacts = {}
 var uniqueImpactID = 0
+var uniqueTimerID = 0
 var animationsCantStop = ["rooted","rootedEnd"]
 var pressed = {"right": false, "left": false, "up": false, "down": false}
+var timers = {}
 
 var directionTimer = 0.1
 var directionTimerLeft = directionTimer
@@ -32,6 +34,9 @@ var dirtTimerLeft = dirtTimer
 
 func newUniqueImpactID ():
 	uniqueImpactID += 1
+
+func newUniqueTimerID ():
+	uniqueTimerID += 1
 
 func addImpact (imp, data):
 	newUniqueImpactID()
@@ -52,18 +57,17 @@ func skillSystem (delta):
 	for i in skills:
 		skills[i].update(delta)
 
-func useSkill (which):
-	skills[which].use()
+func useSkill (which, data):
+	skills[which].use(data)
+
+func getSkillInfo (who, which):
+	var data = skills[which].getSharedData()
+	data["gotInfo"] = true
+	main.rpc_id(who,"objectCalled",-1,id,"updateSkillInfo",[which,data])
 
 func anySkillCasting ():
 	for i in skills:
 		if "casting" in skills[i] && skills[i].casting == true:
-			return true
-	return false
-
-func anySkillIndicating ():
-	for i in skills:
-		if "indicating" in skills[i] && skills[i].indicating == true:
 			return true
 	return false
 
@@ -140,6 +144,9 @@ func _on_DirectionTimer_timeout():
 		animation = direction + "Walk"
 	elif canMove:
 		animation = direction + "Idle"
+
+func destroy ():
+	Physics2DServer.free_rid(body)
 
 func init ():
 	pass
