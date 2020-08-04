@@ -10,11 +10,17 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
+"class": "Character",
+"language": "GDScript",
+"path": "res://Scripts/Base/Character.gd"
+}, {
+"base": "Node",
 "class": "CustomTimer",
 "language": "GDScript",
 "path": "res://Scripts/Misc/CustomTimer.gd"
 } ]
 _global_script_class_icons={
+"Character": "",
 "CustomTimer": ""
 }
 

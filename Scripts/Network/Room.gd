@@ -25,6 +25,7 @@ var mapSizeY = 50
 var gridSize = 64
 var space : RID
 var roomBorders
+var objectsByRID = {}
 
 func ready():
 	Vars.roomUniqueID += 1
@@ -79,6 +80,31 @@ func objectCalled (who, obj, funcName, data):
 			Vars.logError("Room " + str(id) + " had a objectCalled, but that object doesn't exist anymore.")
 		return
 	objects[obj]["instance"].callv(funcName,data)
+
+func removeObject (idd):
+	objects.erase(idd)
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"objectRemoved",-1,idd)
+
+func updateObject (idd, data):
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"objectUpdated",-1,idd,data)
+
+func createObject (path, data):
+	newUniqueObjectID()
+	data["id"] = uniqueObjectID
+	data["room"] = id
+	objects[uniqueObjectID] = {}
+	objects[uniqueObjectID]["object"] = "res://Prefabs/" + path + ".tscn"
+	objects[uniqueObjectID]["instance"] = load("res://Scripts/" + path + ".gd").new()
+	for i in data:
+		objects[uniqueObjectID]["instance"][i] = data[i]
+	for i in playerIDS:
+		if Vars.players[i]["inGame"]:
+			main.rpc_id(i,"objectCreated",-1,objects[uniqueObjectID]["object"],data)
+	return objects[uniqueObjectID]["instance"]
 
 func playerJoined (who):
 	if playerIDS.has(who):
@@ -175,10 +201,10 @@ func readyToGetObjects (who):
 	for i in dirts:
 		main.rpc_id(who,"dirtCreated",dirts[i])
 	for i in playerIDS:
-		main.rpc_id(who,"playerJoined",i,objects[i]["object"],objects[i]["instance"].getSharedData())
+		main.rpc_id(who,"playerJoined",-1,objects[i]["object"],objects[i]["instance"].getSharedData())
 	for i in objects:
 		if !("Characters" in objects[i]["object"]):
-			main.rpc_id(who,"objectCreated",who,objects[i]["object"],objects[who]["instance"].getSharedData())
+			main.rpc_id(who,"objectCreated",-1,objects[i]["object"],objects[i]["instance"].getSharedData())
 
 func demandGameTime(who, unixTime):
 	if started:

@@ -2,10 +2,9 @@ extends "res://Scripts/Base/Skill.gd"
 
 var main
 var casting = false
-var maxRange = 1000
-var area = 9
+var maxRange = 200
 var castTime = 0.5
-var cooldown = 5
+var cooldown = 7
 var cooldownRemaining = 0
 var castRemaining = castTime
 var castLocation = Vector2.ZERO
@@ -17,7 +16,6 @@ func _ready():
 func getSharedData ():
 	var data = {}
 	data["maxRange"] = maxRange
-	data["area"] = area
 	data["castTime"] = castTime
 	data["cooldown"] = cooldown
 	data["cooldownRemaining"] = cooldownRemaining
@@ -41,7 +39,8 @@ func cast (data):
 func castEnd():
 	casting = false
 	cooldownRemaining = cooldown
-	Vars.rooms[characterScript.room].createObject("Objects/Seed",{"whoSummoned": characterScript, "position": characterScript.position, "endPosition": castLocation, "area": area})
+	var node = Vars.rooms[characterScript.room].createObject("Objects/BearTrap",{"whoSummoned": characterScript, "position": characterScript.position, "endPosition": castLocation})
+	node.init()
 	main.rpc_id(characterScript.id,"objectCalled",-1,characterScript.id,"skillCalled",[id, "castEnd", [[]]])
 
 func update (delta):

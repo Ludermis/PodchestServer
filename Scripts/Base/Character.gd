@@ -1,5 +1,7 @@
 extends Node
 
+class_name Character
+
 var main
 var room
 var body
@@ -23,7 +25,6 @@ var skills = {}
 var impacts = {}
 var uniqueImpactID = 0
 var uniqueTimerID = 0
-var animationsCantStop = ["rooted","rootedEnd"]
 var pressed = {"right": false, "left": false, "up": false, "down": false}
 var timers = {}
 
@@ -40,14 +41,12 @@ func newUniqueTimerID ():
 
 func addImpact (imp, data):
 	newUniqueImpactID()
-	var index = uniqueImpactID
-	impacts[index] = load("res://Scripts/Impacts/" + imp + ".gd").new()
-	impacts[index].id = index
-	impacts[index].ownerNode = id
+	impacts[uniqueImpactID] = load("res://Scripts/Impacts/" + imp + ".gd").new()
+	impacts[uniqueImpactID].id = uniqueImpactID
+	impacts[uniqueImpactID].ownerScript = self
 	for i in data:
-		impacts[index][i] = data[i]
-	impacts[index].begin()
-	return index
+		impacts[uniqueImpactID][i] = data[i]
+	impacts[uniqueImpactID].begin()
 
 func impactSystem (delta):
 	for i in impacts:
@@ -146,6 +145,7 @@ func _on_DirectionTimer_timeout():
 		animation = direction + "Idle"
 
 func destroy ():
+	Vars.rooms[room].objectsByRID.erase(body)
 	Physics2DServer.free_rid(body)
 
 func init ():
