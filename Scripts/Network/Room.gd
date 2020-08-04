@@ -103,7 +103,7 @@ func createObject (path, data):
 		objects[uniqueObjectID]["instance"][i] = data[i]
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
-			main.rpc_id(i,"objectCreated",-1,objects[uniqueObjectID]["object"],data)
+			main.rpc_id(i,"objectCreated",-1,objects[uniqueObjectID]["object"],objects[uniqueObjectID]["instance"].getSharedData())
 	return objects[uniqueObjectID]["instance"]
 
 func playerJoined (who):

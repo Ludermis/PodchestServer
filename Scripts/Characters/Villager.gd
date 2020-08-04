@@ -2,6 +2,8 @@ extends "res://Scripts/Base/Character.gd"
 
 var scytheActive = false
 var scytheRotation = 0
+var mousePos = Vector2.ZERO
+var scytheTimerID
 
 func getSharedData ():
 	var data = {}
@@ -10,6 +12,8 @@ func getSharedData ():
 	data["team"] = team
 	data["playerName"] = playerName
 	data["animation"] = animation
+	data["scytheRotation"] = scytheRotation
+	data["scytheActive"] = scytheActive
 	data["id"] = id
 	return data
 
@@ -23,6 +27,18 @@ func update (delta):
 	
 	Vars.rooms[room].updateObject(id,getSharedData())
 
+func scytheTimerTimeout ():
+	var optimizedPos = Vars.optimizeVector(position + Vector2(32,32),64)
+	var vec = (mousePos - optimizedPos).normalized()
+	vec = Vars.optimizeVector(optimizedPos + vec * 64 + Vector2(32,32), 64)
+	dirtToPos(vec)
+
+func dirtToPos (pos):
+	if !Vars.rooms[room].dirts.has(pos):
+		Vars.tryPlaceDirt(room,id,pos,team)
+	elif Vars.rooms[room].dirts[pos].team != team:
+		Vars.tryChangeDirt(room,id,pos,team)
+
 func init():
 	characterName = "Villager"
 	newUniqueTimerID()
@@ -35,6 +51,12 @@ func init():
 	timers[uniqueTimerID].time = 0.1
 	timers[uniqueTimerID].connect("timeout",self,"_on_DirtTimer_timeout")
 	timers[uniqueTimerID].start()
+	newUniqueTimerID()
+	scytheTimerID = uniqueTimerID
+	timers[scytheTimerID] = CustomTimer.new()
+	timers[scytheTimerID].time = 0.005
+	timers[scytheTimerID].connect("timeout",self,"scytheTimerTimeout")
+	
 	body = Physics2DServer.body_create()
 	Vars.rooms[room].objectsByRID[body] = self
 	Physics2DServer.body_set_mode(body, Physics2DServer.BODY_MODE_CHARACTER)
@@ -56,3 +78,8 @@ func init():
 	skills[2].id = 2
 	skills[2].main = main
 	skills[2].characterScript = self
+	
+	skills[3] = preload("res://Scripts/Skills/Villager/VillagerRSkill.gd").new()
+	skills[3].id = 3
+	skills[3].main = main
+	skills[3].characterScript = self

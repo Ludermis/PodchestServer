@@ -12,7 +12,6 @@ func start ():
 	working = true
 
 func stop ():
-	timeLeft = time
 	working = false
 
 func update (delta):
