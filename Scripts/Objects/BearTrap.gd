@@ -33,14 +33,15 @@ func init ():
 	Vars.rooms[room].objectsByRID[area] = self
 
 func bodyEntered (state, rid, id, shape_idx_obj, shape_idx_area):
-	if planted && trappedPlayer == -1 && state == Physics2DServer.AREA_BODY_ADDED && Vars.rooms[room].objectsByRID[rid] is Character && Vars.rooms[room].objectsByRID[rid].team != whoSummoned.team:
+	if trappedPlayer == -1 && Vars.rooms[room].objectsByRID[rid] is Character && Vars.rooms[room].objectsByRID[rid].team != whoSummoned.team:
+		planted = true
 		trappedPlayer = Vars.rooms[room].objectsByRID[rid].id
-		Vars.rooms[room].objectsByRID[rid].addImpact("RootImpact",{"timeRemaining": trapTimeRemaining, "animStart": "rooted", "animEnd": "rootedEnd", "endAnimStartTime": 0.15})
+		Vars.rooms[room].objectsByRID[rid].addImpact("RootImpact",{"timeRemaining": trapTimeRemaining, "animStart": "rooted", "animEnd": "rootedEnd", "endAnimStartTime": 0.15, "disableSkills": true})
 
 func update (delta):
 	if !planted:
 		position = position.move_toward(endPosition,delta * speed)
-		Physics2DServer.area_set_transform(area, Transform2D(0, Vector2(position.x, position.y)))
+		Physics2DServer.area_set_transform(area, Transform2D(0, position))
 	if planted == false && position.distance_to(endPosition) < 0.1:
 		position = endPosition
 		planted = true

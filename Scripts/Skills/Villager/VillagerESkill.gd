@@ -27,7 +27,8 @@ func _init():
 	type = "skillshot"
 
 func use (data):
-	cast(data)
+	if characterScript.canUseSkills:
+		cast(data)
 
 func cast (data):
 	casting = true

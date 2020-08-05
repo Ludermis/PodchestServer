@@ -6,6 +6,7 @@ var impactName = "RootImpact"
 var animStart
 var animEnd
 var endAnimStartTime = 0.1
+var disableSkills = false
 
 func _init():
 	type = "constant"
@@ -23,9 +24,13 @@ func begin():
 	ownerScript.canMove = false
 	if animStart != null:
 		ownerScript.animation = animStart
+	if disableSkills:
+		ownerScript.canUseSkills = false
 
 func update(delta):
 	ownerScript.canMove = false
+	if disableSkills:
+		ownerScript.canUseSkills = false
 	timeRemaining -= delta
 	if timeRemaining <= endAnimStartTime:
 		if animEnd != null:
@@ -39,3 +44,5 @@ func end():
 		ownerScript.animation = animEnd
 	ownerScript.canMove = true
 	ownerScript.impacts.erase(id)
+	if disableSkills:
+		ownerScript.canUseSkills = true

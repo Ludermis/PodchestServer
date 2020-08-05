@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "35"
+var build = "36"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 var debugTextLevel = 1
@@ -17,7 +17,7 @@ var friction = 0.2
 var store = {
 	"characters": {
 			"Xedarin": {"gold": 450, "AP": 260}
-			#"Mold": {"gold": 1350, "AP": 260}
+			#"Mold": {"gold": 1350, "AP": 450}
 		},
 	"skins": {
 			"Villager": {"Villagernaut": {"AP": 1350}}

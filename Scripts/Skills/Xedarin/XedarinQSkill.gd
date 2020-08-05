@@ -24,7 +24,8 @@ func _init():
 	type = "cast"
 
 func use (data):
-	cast(data)
+	if characterScript.canUseSkills:
+		cast(data)
 
 func cast (data):
 	casting = true

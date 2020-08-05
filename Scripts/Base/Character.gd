@@ -15,6 +15,7 @@ var position
 var id
 var team = -1
 var canMove = true
+var canUseSkills = true
 var animation = "downIdle"
 var desiredDirection = "down"
 var direction = "down"

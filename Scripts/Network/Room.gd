@@ -207,11 +207,10 @@ func readyToGetObjects (who):
 			main.rpc_id(who,"objectCreated",-1,objects[i]["object"],objects[i]["instance"].getSharedData())
 
 func demandGameTime(who, unixTime):
-	var upload = OS.get_system_time_msecs() - unixTime
 	if started:
-		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), OS.get_system_time_msecs(), upload)
+		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
 	elif selectionStarted:
-		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), OS.get_system_time_msecs(), upload)
+		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), unixTime)
 
 func playerDisconnected (who):
 	leaveRoom(who)
