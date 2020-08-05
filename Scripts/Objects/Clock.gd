@@ -80,7 +80,7 @@ func init ():
 	Physics2DServer.body_set_collision_mask(body, 0)
 	Physics2DServer.body_set_state(body, Physics2DServer.BODY_STATE_TRANSFORM, Transform2D(0, position))
 	Physics2DServer.body_set_state(body,Physics2DServer.BODY_STATE_LINEAR_VELOCITY,dir * speed)
-	Physics2DServer.body_set_continuous_collision_detection_mode(body,Physics2DServer.CCD_MODE_CAST_RAY)
+	#Physics2DServer.body_set_continuous_collision_detection_mode(body,Physics2DServer.CCD_MODE_CAST_RAY)
 	Physics2DServer.body_set_max_contacts_reported(body,3)
 	
 	area = Physics2DServer.area_create()
@@ -109,6 +109,7 @@ func bodyEntered (rid):
 	dir *= -1
 	dir = dir.normalized()
 	Physics2DServer.body_set_state(body,Physics2DServer.BODY_STATE_LINEAR_VELOCITY,dir * speed)
+	Physics2DServer.body_set_state(body, Physics2DServer.BODY_STATE_TRANSFORM, Transform2D(0, Physics2DServer.body_get_state(body,Physics2DServer.BODY_STATE_TRANSFORM).origin + dir * 4))
 	return false
 
 func update (delta):

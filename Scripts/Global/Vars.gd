@@ -8,7 +8,7 @@ var time : float = 0 setget ,getTime
 var accounts = {}
 var accountsByIDs = {}
 var IDsByAccounts = {}
-var build = "33"
+var build = "35"
 var accountsFileLocation = "user://accounts.txt"
 var logsFolder = "user://logs/"
 var debugTextLevel = 1
@@ -83,7 +83,6 @@ func listFiles(path):
 		elif not file.begins_with("."):
 			files.append(file)
 	dir.list_dir_end()
-	files.sort()
 	return files
 
 func logInfo (msg):

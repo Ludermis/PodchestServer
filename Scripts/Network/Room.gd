@@ -189,7 +189,7 @@ func dirtChanged (painter, pos, team):
 func readyToGetObjects (who):
 	if ended:
 		main.rpc_id(who,"updateTeams",teams)
-		main.rpc_id(who,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerNames": {1: teams[1]["playerNames"], 2: teams[2]["playerNames"]}, "yourCharacter": objects[who]["instance"]["characterName"], "goldEarned": -1})
+		main.rpc_id(who,"gameEnded",{"winner": winner, "scores": [0,teams[1]["score"],teams[2]["score"]], "playerInfos": {1: teams[1]["playerInfo"], 2: teams[2]["playerInfo"]}, "yourCharacter": objects[who]["instance"]["characterName"], "goldEarned": -1})
 		return
 	Vars.players[who]["inGame"] = true
 	for i in playerIDS:
@@ -207,10 +207,11 @@ func readyToGetObjects (who):
 			main.rpc_id(who,"objectCreated",-1,objects[i]["object"],objects[i]["instance"].getSharedData())
 
 func demandGameTime(who, unixTime):
+	var upload = OS.get_system_time_msecs() - unixTime
 	if started:
-		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
+		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), OS.get_system_time_msecs(), upload)
 	elif selectionStarted:
-		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), unixTime)
+		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), OS.get_system_time_msecs(), upload)
 
 func playerDisconnected (who):
 	leaveRoom(who)

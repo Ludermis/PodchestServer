@@ -166,6 +166,16 @@ remote func objectCalled (who, obj, funcName, data):
 		if Vars.debugTextLevel >= 1:
 			Vars.logError("User " + str(who) + " (" + Vars.getNameByID(who) + ") tried to objectCalled but that room doesn't exists.")
 
+func customComparison(a, b):
+	var arr1 = a.split("-")
+	var arr2 = b.split("-")
+	if arr1[2] != arr2[2]:
+		return arr1[2] > arr2[2]
+	elif arr1[1] != arr2[1]:
+		return arr1[1] > arr2[1]
+	else:
+		return arr1[0] > arr2[0]
+
 remote func demandAdminInfo (who, demand):
 	if !Vars.accountsByIDs.has(who):
 		if Vars.debugTextLevel >= 1:
@@ -180,7 +190,7 @@ remote func demandAdminInfo (who, demand):
 		var dict = {"serverDate": Vars.currentDateToStringMinimal(),"logs": []}
 		
 		var files = Vars.listFiles(Vars.logsFolder)
-		files.invert()
+		files.sort_custom(self, "customComparison")
 		for i in files:
 			dict["logs"].append((i.trim_suffix(".txt")))
 		rpc_id(who,"gotAdminInfo",demand,dict)
