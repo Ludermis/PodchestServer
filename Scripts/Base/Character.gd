@@ -6,6 +6,8 @@ var main
 var room
 var body
 var shape
+var area
+var areaShape
 var velocity = Vector2.ZERO
 var acceleration = 64
 var maxSpeed = 384
@@ -27,11 +29,6 @@ var uniqueImpactID = 0
 var uniqueTimerID = 0
 var pressed = {"right": false, "left": false, "up": false, "down": false}
 var timers = {}
-
-var directionTimer = 0.1
-var directionTimerLeft = directionTimer
-var dirtTimer = 0.1
-var dirtTimerLeft = dirtTimer
 
 func newUniqueImpactID ():
 	uniqueImpactID += 1
@@ -90,6 +87,7 @@ func movementHandler (delta):
 	
 	Physics2DServer.body_set_state(body,Physics2DServer.BODY_STATE_LINEAR_VELOCITY,velocity)
 	position = Physics2DServer.body_get_state(body,Physics2DServer.BODY_STATE_TRANSFORM).origin
+	Physics2DServer.area_set_transform(area, Transform2D(0,position))
 
 func findNextDirection ():
 	if desiredDirection == direction:
@@ -147,6 +145,9 @@ func _on_DirectionTimer_timeout():
 func destroy ():
 	Vars.rooms[room].objectsByRID.erase(body)
 	Physics2DServer.free_rid(body)
+	Vars.rooms[room].objectsByRID.erase(area)
+	Physics2DServer.free_rid(area)
+	Vars.rooms[room].removeObject(id)
 
 func init ():
 	pass

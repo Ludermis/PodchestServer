@@ -279,6 +279,7 @@ func endGame():
 	Vars.logInfo("Game ended on room " + str(id))
 
 func removeRoom (msg):
+	ended = true
 	roomBorders.destroy()
 	for i in objects:
 		objects[i]["instance"].destroy()

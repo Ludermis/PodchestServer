@@ -21,7 +21,7 @@ func init():
 	Physics2DServer.body_add_shape(body, shape2, Transform2D(0,Vector2(Vars.rooms[room].mapSizeX * Vars.rooms[room].gridSize - 48,-Vars.rooms[room].mapSizeY * Vars.rooms[room].gridSize / 2)))
 	Physics2DServer.body_set_space(body, Vars.rooms[room].space)
 	Physics2DServer.body_set_collision_layer(body, 1)
-	Physics2DServer.body_set_collision_mask(body, 3)
+	Physics2DServer.body_set_collision_mask(body, 1)
 	Physics2DServer.body_set_state(body, Physics2DServer.BODY_STATE_TRANSFORM, Transform2D(0, Vector2(position.x, position.y)))
 
 func destroy ():

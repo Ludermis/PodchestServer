@@ -1,9 +1,6 @@
 extends "res://Scripts/Base/Character.gd"
 
-var scytheActive = false
-var scytheRotation = 0
-var mousePos = Vector2.ZERO
-var scytheTimerID
+var clocks = []
 
 func getSharedData ():
 	var data = {}
@@ -12,8 +9,6 @@ func getSharedData ():
 	data["team"] = team
 	data["playerName"] = playerName
 	data["animation"] = animation
-	data["scytheRotation"] = scytheRotation
-	data["scytheActive"] = scytheActive
 	data["id"] = id
 	return data
 
@@ -27,20 +22,8 @@ func update (delta):
 	
 	Vars.rooms[room].updateObject(id,getSharedData())
 
-func scytheTimerTimeout ():
-	var optimizedPos = Vars.optimizeVector(position + Vector2(32,32),64)
-	var vec = (mousePos - optimizedPos).normalized()
-	vec = Vars.optimizeVector(optimizedPos + vec * 64 + Vector2(32,32), 64)
-	dirtToPos(vec)
-
-func dirtToPos (pos):
-	if !Vars.rooms[room].dirts.has(pos):
-		Vars.tryPlaceDirt(room,id,pos,team)
-	elif Vars.rooms[room].dirts[pos].team != team:
-		Vars.tryChangeDirt(room,id,pos,team)
-
 func init():
-	characterName = "Villager"
+	characterName = "Xedarin"
 	newUniqueTimerID()
 	timers[uniqueTimerID] = CustomTimer.new()
 	timers[uniqueTimerID].time = 0.1
@@ -51,11 +34,6 @@ func init():
 	timers[uniqueTimerID].time = 0.1
 	timers[uniqueTimerID].connect("timeout",self,"_on_DirtTimer_timeout")
 	timers[uniqueTimerID].start()
-	newUniqueTimerID()
-	scytheTimerID = uniqueTimerID
-	timers[scytheTimerID] = CustomTimer.new()
-	timers[scytheTimerID].time = 0.005
-	timers[scytheTimerID].connect("timeout",self,"scytheTimerTimeout")
 	
 	body = Physics2DServer.body_create()
 	Vars.rooms[room].objectsByRID[body] = self
@@ -81,17 +59,17 @@ func init():
 	Physics2DServer.area_set_transform(area,Transform2D(0,position))
 	Physics2DServer.area_set_monitorable(area, true)
 	
-	skills[1] = preload("res://Scripts/Skills/Villager/VillagerQSkill.gd").new()
+	skills[1] = preload("res://Scripts/Skills/Xedarin/XedarinQSkill.gd").new()
 	skills[1].id = 1
 	skills[1].main = main
 	skills[1].characterScript = self
 	
-	skills[2] = preload("res://Scripts/Skills/Villager/VillagerESkill.gd").new()
+	skills[2] = preload("res://Scripts/Skills/Xedarin/XedarinESkill.gd").new()
 	skills[2].id = 2
 	skills[2].main = main
 	skills[2].characterScript = self
 	
-	skills[3] = preload("res://Scripts/Skills/Villager/VillagerRSkill.gd").new()
+	skills[3] = preload("res://Scripts/Skills/Xedarin/XedarinRSkill.gd").new()
 	skills[3].id = 3
 	skills[3].main = main
 	skills[3].characterScript = self
