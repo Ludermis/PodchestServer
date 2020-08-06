@@ -4,14 +4,11 @@ var clocks = []
 
 func getSharedData ():
 	var data = {}
-	data["pos"] = position
+	data["position"] = position
 	data["skin"] = skin
 	data["team"] = team
 	data["playerName"] = playerName
 	data["animation"] = animation
-	data["canMove"] = canMove
-	data["maxSpeed"] = maxSpeed
-	data["acceleration"] = acceleration
 	data["id"] = id
 	return data
 
