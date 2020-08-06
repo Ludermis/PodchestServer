@@ -195,9 +195,6 @@ func readyToGetObjects (who):
 	for i in playerIDS:
 		if Vars.players[i]["inGame"]:
 			main.rpc_id(i,"updateTeams",teams)
-	for i in playerIDS:
-		if Vars.players[i]["inGame"] && i != who:
-			main.rpc_id(i,"playerJoined",who,objects[who]["object"],objects[who]["instance"].getSharedData())
 	for i in dirts:
 		main.rpc_id(who,"dirtCreated",dirts[i])
 	for i in playerIDS:
