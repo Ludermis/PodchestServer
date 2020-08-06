@@ -7,13 +7,16 @@ var scytheTimerID
 
 func getSharedData ():
 	var data = {}
-	data["position"] = position
+	data["pos"] = position
 	data["skin"] = skin
 	data["team"] = team
 	data["playerName"] = playerName
 	data["animation"] = animation
 	data["scytheRotation"] = scytheRotation
 	data["scytheActive"] = scytheActive
+	data["canMove"] = canMove
+	data["maxSpeed"] = maxSpeed
+	data["acceleration"] = acceleration
 	data["id"] = id
 	return data
 
