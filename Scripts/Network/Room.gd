@@ -284,4 +284,5 @@ func removeRoom (msg):
 	for i in objects:
 		objects[i]["instance"].destroy()
 	Vars.rooms.erase(id)
+	Physics2DServer.free_rid(space)
 	Vars.logInfo(msg)
