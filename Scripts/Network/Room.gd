@@ -58,7 +58,7 @@ func update(delta):
 	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
 		startGame()
 	if started && !ended:
-		for i in objects:
+		for i in objects.keys():
 			objects[i]["instance"].update(delta)
 
 func newUniqueObjectID():
