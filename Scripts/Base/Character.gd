@@ -115,7 +115,6 @@ func _on_DirtTimer_timeout():
 		Vars.tryPlaceDirt(room,id,vec,team)
 	elif Vars.rooms[room].dirts[vec].team != team:
 		Vars.tryChangeDirt(room,id,vec,team)
-	pass
 
 func inputHandler (delta):
 	if canMove:

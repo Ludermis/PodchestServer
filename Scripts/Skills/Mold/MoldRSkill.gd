@@ -7,7 +7,9 @@ var cooldown = 20
 var cooldownRemaining = 0
 var castRemaining = castTime
 var characterScript
-var area = 51
+var clonesToSummon = 9
+var activeTime = 10
+var activeTimeRemaining = 0
 
 func _ready():
 	pass
@@ -34,26 +36,21 @@ func cast (data):
 	main.rpc_id(characterScript.id,"objectCalled",-1,characterScript.id,"skillCalled",[id, "cast", [data]])
 	characterScript.addImpact("RootImpact",{"timeRemaining": castTime, "animStart": "cast"})
 
+func findRandomEnemyPlayer():
+	var rtn = characterScript.id
+	var idArray = []
+	for i in Vars.rooms[characterScript.room].objects:
+		if Vars.rooms[characterScript.room].objects[i]["instance"] is Character && Vars.rooms[characterScript.room].objects[i]["instance"].team != characterScript.team:
+			idArray.append(i)
+	if idArray.size() > 0:
+		rtn = idArray[randi() % idArray.size()]
+	return rtn
+
 func castEnd():
 	casting = false
 	cooldownRemaining = cooldown
-	
-	Vars.rooms[characterScript.room].createObject("Effects/Shockwave",{"position": characterScript.position})
-	for x in range(1,area / 2 + 2):
-		for y in range (-area / 2 + (x - 1),area / 2 + 1 - (x - 1)):
-			var pos = Vars.optimizeVector(characterScript.position + Vector2(32,32),64) + Vector2(y * 64, (x - 1) * 64)
-			if Vars.rooms[characterScript.room].dirts.has(pos) && Vars.rooms[characterScript.room].dirts[pos].team == 1:
-				Vars.tryChangeDirt(characterScript.room,characterScript.id,pos,2)
-			elif Vars.rooms[characterScript.room].dirts.has(pos):
-				Vars.tryChangeDirt(characterScript.room,characterScript.id,pos,1)
-	for x in range(1,area / 2 + 1):
-		for y in range (-area / 2 + x,area / 2 + 1 - x):
-			var pos = Vars.optimizeVector(characterScript.position + Vector2(32,32),64) + Vector2(y * 64, -x * 64)
-			if Vars.rooms[characterScript.room].dirts.has(pos) && Vars.rooms[characterScript.room].dirts[pos].team == 1:
-				Vars.tryChangeDirt(characterScript.room,characterScript.id,pos,2)
-			elif Vars.rooms[characterScript.room].dirts.has(pos):
-				Vars.tryChangeDirt(characterScript.room,characterScript.id,pos,1)
-	
+	activeTimeRemaining = activeTime
+	characterScript.disguised = findRandomEnemyPlayer()
 	main.rpc_id(characterScript.id,"objectCalled",-1,characterScript.id,"skillCalled",[id, "castEnd", [[]]])
 
 func update (delta):
@@ -63,5 +60,9 @@ func update (delta):
 			castEnd()
 	elif cooldownRemaining > 0:
 		cooldownRemaining -= delta
+	if characterScript.disguised != -1:
+		activeTimeRemaining -= delta
+		if activeTimeRemaining <= 0:
+			characterScript.disguised = -1
 	if Vars.players.has(characterScript.id) && Vars.players[characterScript.id]["inGame"]:
 		main.rpc_id(characterScript.id,"objectCalled",-1,characterScript.id,"updateSkillInfo",[id,getSharedData()])

@@ -278,7 +278,7 @@ func endGame():
 func removeRoom (msg):
 	ended = true
 	roomBorders.destroy()
-	for i in objects:
+	for i in objects.keys():
 		objects[i]["instance"].destroy()
 	Vars.rooms.erase(id)
 	Physics2DServer.free_rid(space)
