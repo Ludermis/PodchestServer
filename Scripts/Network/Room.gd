@@ -58,8 +58,10 @@ func update(delta):
 	if selectionStarted == true && started == false && Vars.time - selectionStartedTime >= selectionLength:
 		startGame()
 	if started && !ended:
-		for i in objects.keys():
-			objects[i]["instance"].update(delta)
+		var objectsKeys = objects.keys()
+		for i in objectsKeys:
+			if objects.has(i):
+				objects[i]["instance"].update(delta)
 
 func newUniqueObjectID():
 	uniqueObjectID += 1
@@ -205,9 +207,9 @@ func readyToGetObjects (who):
 
 func demandGameTime(who, unixTime):
 	if started:
-		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime)
+		main.rpc_id(who,"gotGameTime",gameLength - (Vars.time - gameStartedTime), unixTime, Vars.physicsFPS)
 	elif selectionStarted:
-		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), unixTime)
+		main.rpc_id(who,"gotGameTime",selectionLength - (Vars.time - selectionStartedTime), unixTime, Vars.physicsFPS)
 
 func playerDisconnected (who):
 	leaveRoom(who)
@@ -278,8 +280,10 @@ func endGame():
 func removeRoom (msg):
 	ended = true
 	roomBorders.destroy()
-	for i in objects.keys():
-		objects[i]["instance"].destroy()
+	var objectsKeys = objects.keys()
+	for i in objectsKeys:
+		if objects.has(i):
+			objects[i]["instance"].destroy()
 	Vars.rooms.erase(id)
 	Physics2DServer.free_rid(space)
 	Vars.logInfo(msg)

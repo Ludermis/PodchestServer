@@ -1,11 +1,17 @@
 extends Node
 class_name CustomTimer
 
-var time = 0
+var time = 0 setget setTime
 var timeLeft = 0
 var working = false
 var id
 signal timeout
+
+func setTime (t):
+	if time == t:
+		return
+	time = t
+	timeLeft = time
 
 func start ():
 	timeLeft = time

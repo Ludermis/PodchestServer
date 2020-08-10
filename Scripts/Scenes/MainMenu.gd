@@ -6,6 +6,10 @@ func _ready():
 	Server.startServer()
 
 func _process(delta):
+	if delta != 0:
+		Vars.physicsFPS = int(ceil(1.0 / delta))
+	else:
+		Vars.physicsFPS = -1
 	for i in Vars.rooms:
 		Vars.rooms[i].update(delta)
 

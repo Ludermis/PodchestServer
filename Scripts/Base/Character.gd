@@ -47,8 +47,10 @@ func addImpact (imp, data):
 	impacts[uniqueImpactID].begin()
 
 func impactSystem (delta):
-	for i in impacts:
-		impacts[i].update(delta)
+	var impactsKeys = impacts.keys()
+	for i in impactsKeys:
+		if impacts.has(i):
+			impacts[i].update(delta)
 
 func skillSystem (delta):
 	for i in skills:

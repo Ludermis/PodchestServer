@@ -81,19 +81,21 @@ func init ():
 	Physics2DServer.body_set_state(body, Physics2DServer.BODY_STATE_TRANSFORM, Transform2D(0, position))
 	Physics2DServer.body_set_state(body,Physics2DServer.BODY_STATE_LINEAR_VELOCITY,dir * speed)
 	#Physics2DServer.body_set_continuous_collision_detection_mode(body,Physics2DServer.CCD_MODE_CAST_RAY)
-	Physics2DServer.body_set_max_contacts_reported(body,3)
+	Physics2DServer.body_set_max_contacts_reported(body,1)
 	
 	area = Physics2DServer.area_create()
 	Vars.rooms[room].objectsByRID[area] = self
 	Physics2DServer.area_add_shape(area, shape, Transform2D(0,Vector2(0,0)))
 	Physics2DServer.area_set_space(area, Vars.rooms[room].space)
-	Physics2DServer.area_set_collision_layer(area, 1)
+	Physics2DServer.area_set_collision_layer(area, 0)
 	Physics2DServer.area_set_collision_mask(area, 1)
 	Physics2DServer.area_set_transform(area,Transform2D(0,position))
 	Physics2DServer.area_set_monitorable(area, true)
 	Physics2DServer.area_set_area_monitor_callback(area, self, "areaEntered")
 
 func areaEntered (state, rid, inst, shapeidx, shapeidx2):
+	if !Vars.rooms[room].objectsByRID.has(rid):
+		return
 	if returnMode == true:
 		if Vars.rooms[room].objectsByRID[rid].id == whoSummoned.id:
 			whoSummoned.skills[1].cooldownRemaining -= 4
