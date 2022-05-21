@@ -1,6 +1,6 @@
 extends Node
 
-var PORT = 27015
+var PORT = 27016
 var server
 
 func _ready():
